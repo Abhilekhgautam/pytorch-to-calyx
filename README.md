@@ -36,6 +36,9 @@ print("MLIR saved to model.mlir")
 
 ```
 
+For a slightly complex model (CNN) check [CNN To Calyx](https://github.com/Abhilekhgautam/pytorch-to-calyx/blob/main/CNN-TO-CALYX.md)
+
+
 Here, we use `allo` to convert our model to `mlir` and save the generated code into the file `model.mlir`.
 
 Allo is the first stage in the pipeline, it simply gives us this mlir:
