@@ -160,7 +160,7 @@ module {
 ```
 So far so good, but we have few more issues before we can lower it down to calyx. Since calyx is a hardware representation, we cannot have a function that returns a memref because memref are pointers and that is not what a hardware does. So we need to remove the return from the function. We can do so by taking an additional argument from the function which will be the output and hence we can return void from the function.
 
-To do so we can use the option `-bufferize-results-to-out-params` with the option enabled for public function as well (typically this option only works for private function) to obtain this:
+To do so we can use the option `-buffer-results-to-out-params` with the option enabled for public function as well (typically this option only works for private function) to obtain this:
 
 ```mlir
 module {
@@ -402,7 +402,7 @@ module {
 }
 ```
 
-We still have the problematic `memref.cop` which we'll convert to `affine.for` first using our custom pass.
+We still have the problematic `memref.copy` which we'll convert to `affine.for` first using our custom pass.
 
 If you run the pass, we see `memref.copy` being converted to `affine.for` as:
 
