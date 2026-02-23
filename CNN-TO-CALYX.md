@@ -69,7 +69,7 @@ But we get hit with illegal `arith.fptoui` error. Seems like `circt-opt` while l
 
 I analyzed the generated mlir and found that `fptoui` is used to obtain a value that is used as an index. On further analysis, I found that replacing `arith.fptoui` with `arith.fptosi` is perfectly okay because the generated mlir has bunch of checks that ensures the obtained index is within the bounds. (I don't know yet If this is a generic solution, but perfectly fine in this case).
 
-Now, if we again run the `lower-scf-to-calyx` pass we should we get. But there is another bug in `circt-opt` pass. circt-opt seem to crash most of the time when we have a global `memref` dense element. I changed the code in my local repo (Currently working on sending the PR) and it works.
+Now, if we again run the `lower-scf-to-calyx` pass we should we get. But there is another bug in `circt-opt` pass. circt-opt seem to crash most of the time when we have a global `memref` dense element. I have sent another [PR](https://github.com/llvm/circt/pull/9738).
 
 We successfully lower to calyx. Wow.
 
