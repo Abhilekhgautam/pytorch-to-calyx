@@ -1,6 +1,6 @@
 # CNN to Calyx
 
-This continues from my work on simple pytorch model. 
+This continues from my work on [simple pytorch model](https://github.com/Abhilekhgautam/pytorch-to-calyx/blob/main/CNN-TO-CALYX.md). 
 
 Below is a simple CNN model in pytorch:
 
@@ -73,4 +73,4 @@ Now, if we again run the `lower-scf-to-calyx` pass we should we get. But there i
 
 We successfully lower to calyx. Wow.
 
-I have to verify the generated calyx and then convert the calyx to verlog. But still this is quite a good progress me.
+I have to verify the generated calyx and then convert the calyx to verlog.
