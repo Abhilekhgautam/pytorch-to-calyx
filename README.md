@@ -36,7 +36,7 @@ print("MLIR saved to model.mlir")
 
 ```
 
-For a slightly complex model (CNN) check [CNN To Calyx](https://github.com/Abhilekhgautam/pytorch-to-calyx/blob/main/CNN-TO-CALYX.md)
+For a slightly complex model (CNN) check [CNN To Calyx](https://github.com/Abhilekhgautam/pytorch-to-calyx/blob/main/CNN-TO-CALYX.md) and [MNIST Digit Recognition Program](https://github.com/Abhilekhgautam/mnist-digit-recognition-calyx)
 
 
 Here, we use `allo` to convert our model to `mlir` and save the generated code into the file `model.mlir`.
