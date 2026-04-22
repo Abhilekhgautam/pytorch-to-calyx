@@ -10,6 +10,7 @@
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/Casting.h>
 #include <mlir/Dialect/Arith/IR/Arith.h>
+#include <mlir/IR/Attributes.h>
 #include <mlir/IR/Builders.h>
 #include <mlir/IR/BuiltinAttributeInterfaces.h>
 #include <mlir/IR/BuiltinAttributes.h>
@@ -18,15 +19,9 @@
 #include <mlir/IR/Value.h>
 #include <mlir/Support/LLVM.h>
 
-#include <iostream>
 #include <tuple>
 
 using namespace mlir;
-
-// const std::unordered_set<std::string_view> cast_ext_ops = {
-//     "arith.index_cast", "arith.extf",   "arith.extsi",        "arith.extui",
-//     "arith.fptoui",     "arith.fptosi", "arith.index_castui",
-//     "arith.trunci"};
 
 struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
   using OpRewritePattern<scf::ForOp>::OpRewritePattern;
@@ -34,13 +29,22 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
   LogicalResult matchAndRewrite(scf::ForOp op,
                                 PatternRewriter &rewriter) const override {
     // iVar : <iVar, multiplicative factor, additive factor>
-    llvm::DenseMap<mlir::Value, std::tuple<mlir::Value, int64_t, int64_t>>
+    llvm::DenseMap<mlir::Value,
+                   std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>
         indVarMap;
 
     // scf.for always has one induction var, the iteration variable.
     auto iterationVar = op.getInductionVar();
+    auto step = op.getConstantStep();
 
-    indVarMap[iterationVar] = std::make_tuple(iterationVar, 1, 1);
+    // scf.for always has a constant step
+    if (!step.has_value()) [[unlikely]]
+      return failure();
+
+    // FixMe: Assumes the step is always 1.
+    indVarMap[iterationVar] =
+        std::make_tuple(iterationVar, rewriter.getIndexAttr(1),
+                        rewriter.getOneAttr(iterationVar.getType()));
 
     auto users = iterationVar.getUsers();
 
@@ -49,7 +53,9 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
       if (auto val = llvm::dyn_cast<arith::IndexCastOp>(user)) {
 
         auto v = val.getOut();
-        indVarMap[v] = std::make_tuple(v, 1, 1);
+        auto out_type = v.getType();
+        indVarMap[v] = std::make_tuple(v, rewriter.getOneAttr(out_type),
+                                       rewriter.getOneAttr(out_type));
       }
     }
 
@@ -65,6 +71,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
           indVarMap[out] = indVarMap[in];
         }
       }
+
       // check for k = j * b , where j is an inductionVar and b is a constant
       if (auto mulOp = llvm::dyn_cast<arith::MulIOp>(elt)) {
         auto lhs = mulOp.getLhs();
@@ -76,27 +83,13 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
           if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
                   rhs.getDefiningOp())) {
             auto val = mulOp.getResult();
-            if (auto int_op = llvm::dyn_cast_if_present<arith::ConstantIntOp>(
-                    rhs.getDefiningOp())) {
-              auto const_val = int_op.value();
-              indVarMap[val] = std::make_tuple(lhs, const_val, 0);
-            } else if (auto index_op =
-                           llvm::dyn_cast_if_present<arith::ConstantIndexOp>(
-                               rhs.getDefiningOp())) {
-              auto const_val = index_op.value();
-              indVarMap[val] = std::make_tuple(lhs, const_val, 0);
-            }
-          } else {
-            std::cout << "RHS not a constant op\n";
-            rhs.dump();
+            auto attr = c_op.getValue();
+
+            indVarMap[val] =
+                std::make_tuple(lhs, attr, rewriter.getZeroAttr(val.getType()));
           }
-        } else {
-          std::cout << "LHS not an induction var\n";
-          lhs.dump();
-          mulOp.dump();
         }
       }
-
       // check for k = j + b
       else if (auto addOp = llvm::dyn_cast<arith::AddIOp>(elt)) {
         auto lhs = addOp.getLhs();
@@ -108,11 +101,11 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
           if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
                   rhs.getDefiningOp())) {
             auto val = addOp.getResult();
-            if (auto int_op = llvm::dyn_cast_if_present<arith::ConstantIntOp>(
-                    rhs.getDefiningOp())) {
-              auto const_val = int_op.value();
-              indVarMap[val] = std::make_tuple(lhs, 1, const_val);
-            }
+            auto attr = c_op.getValue();
+
+            auto out_type = val.getType();
+            indVarMap[val] =
+                std::make_tuple(lhs, rewriter.getOneAttr(out_type), attr);
           }
         }
       }
@@ -128,11 +121,12 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
           if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
                   rhs.getDefiningOp())) {
             auto val = subOp.getResult();
-            if (auto int_op = llvm::dyn_cast_if_present<arith::ConstantIntOp>(
-                    rhs.getDefiningOp())) {
-              auto const_val = int_op.value();
-              indVarMap[val] = std::make_tuple(lhs, 1, const_val);
-            }
+            auto attr = c_op.getValue();
+
+            auto out_type = val.getType();
+
+            indVarMap[val] =
+                std::make_tuple(lhs, rewriter.getOneAttr(out_type), attr);
           }
         }
       }
@@ -154,7 +148,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                 llvm::dyn_cast_if_present<arith::MulIOp>(key.getDefiningOp())) {
           auto resultType = mulOp.getType();
 
-          auto attr = mlir::IntegerAttr::get(resultType, std::get<2>(value));
+          auto attr = std::get<2>(value);
 
           auto newYieldValuesFn = [&](OpBuilder &rewriter, Location loc,
                                       ArrayRef<BlockArgument> newBbArgs)
@@ -163,7 +157,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
 
             auto resultType = currentAcc.getType();
 
-            auto attr = mlir::IntegerAttr::get(resultType, std::get<1>(value));
+            auto attr = std::get<1>(value);
 
             // We Update the accumulator exactly before the yield.
             rewriter.setInsertionPoint(op.getBody()->getTerminator());
