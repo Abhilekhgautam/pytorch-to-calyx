@@ -15,6 +15,7 @@
 #include <mlir/IR/BuiltinAttributeInterfaces.h>
 #include <mlir/IR/BuiltinAttributes.h>
 #include <mlir/IR/Location.h>
+#include <mlir/IR/Matchers.h>
 #include <mlir/IR/Types.h>
 #include <mlir/IR/Value.h>
 #include <mlir/Support/LLVM.h>
@@ -23,14 +24,101 @@
 
 using namespace mlir;
 
+mlir::TypedAttr multiplyAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
+                              mlir::TypedAttr opTwo) {
+  if (llvm::isa<IntegerAttr>(opOne)) {
+    auto intOpOne = llvm::dyn_cast<IntegerAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<IntegerAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto product = opOneValue * opTwoValue;
+
+    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), product);
+  } else if (llvm::isa<FloatAttr>(opOne)) {
+
+    auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<FloatAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto product = opOneValue * opTwoValue;
+
+    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), product);
+  } else
+    return {};
+}
+
+mlir::TypedAttr addAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
+                         mlir::TypedAttr opTwo) {
+  if (llvm::isa<IntegerAttr>(opOne)) {
+    auto intOpOne = llvm::dyn_cast<IntegerAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<IntegerAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto sum = opOneValue + opTwoValue;
+
+    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), sum);
+  } else if (llvm::isa<FloatAttr>(opOne)) {
+
+    auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<FloatAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto sum = opOneValue + opTwoValue;
+
+    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), sum);
+  } else
+    return {};
+}
+
+mlir::TypedAttr subAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
+                         mlir::TypedAttr opTwo) {
+  if (llvm::isa<IntegerAttr>(opOne)) {
+    auto intOpOne = llvm::dyn_cast<IntegerAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<IntegerAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto diff = opOneValue - opTwoValue;
+
+    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), diff);
+  } else if (llvm::isa<FloatAttr>(opOne)) {
+
+    auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
+    auto intOpTwo = llvm::dyn_cast<FloatAttr>(opTwo);
+
+    auto opOneValue = intOpOne.getValue();
+    auto opTwoValue = intOpTwo.getValue();
+
+    // let it truncate
+    auto diff = opOneValue - opTwoValue;
+
+    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), diff);
+  } else
+    return {};
+}
+
 struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
   using OpRewritePattern<scf::ForOp>::OpRewritePattern;
 
   LogicalResult matchAndRewrite(scf::ForOp op,
                                 PatternRewriter &rewriter) const override {
     // iVar : <iVar, multiplicative factor, additive factor>
-    llvm::DenseMap<mlir::Value,
-                   std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>
+    llvm::MapVector<mlir::Value,
+                    std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>
         indVarMap;
 
     // scf.for always has one induction var, the iteration variable.
@@ -42,36 +130,26 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
       return failure();
 
     // FixMe: Assumes the step is always 1.
-    indVarMap[iterationVar] =
-        std::make_tuple(iterationVar, rewriter.getIndexAttr(1),
-                        rewriter.getOneAttr(iterationVar.getType()));
-
-    auto users = iterationVar.getUsers();
-
-    for (const auto user : users) {
-      // Iteration Variable is an index. The cast must be any of Index Cast.
-      if (auto val = llvm::dyn_cast<arith::IndexCastOp>(user)) {
-
-        auto v = val.getOut();
-        auto out_type = v.getType();
-        indVarMap[v] = std::make_tuple(v, rewriter.getOneAttr(out_type),
-                                       rewriter.getOneAttr(out_type));
-      }
-    }
+    indVarMap[iterationVar] = std::make_tuple(
+        iterationVar, rewriter.getOneAttr(iterationVar.getType()),
+        rewriter.getZeroAttr(iterationVar.getType()));
 
     auto body = op.getBody();
 
     for (auto &elt : *body) {
+
       if (llvm::isa<arith::IndexCastOp, arith::TruncIOp, arith::ExtSIOp,
                     arith::ExtUIOp>(elt)) {
-        auto in = elt.getOperand(0);
 
+        auto in = elt.getOperand(0);
         if (indVarMap.count(in)) {
-          auto out = elt.getResult(0);
-          indVarMap[out] = indVarMap[in];
+
+          auto v = elt.getResult(0);
+          auto out_type = v.getType();
+          indVarMap[v] = std::make_tuple(v, rewriter.getOneAttr(out_type),
+                                         rewriter.getZeroAttr(out_type));
         }
       }
-
       // check for k = j * b , where j is an inductionVar and b is a constant
       if (auto mulOp = llvm::dyn_cast<arith::MulIOp>(elt)) {
         auto lhs = mulOp.getLhs();
@@ -85,8 +163,20 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
             auto val = mulOp.getResult();
             auto attr = c_op.getValue();
 
-            indVarMap[val] =
-                std::make_tuple(lhs, attr, rewriter.getZeroAttr(val.getType()));
+            auto [baseVar, multiplicativeFactor, additiveFactor] =
+                indVarMap[lhs];
+
+            if (additiveFactor.getType() == attr.getType()) {
+              auto mulAttr =
+                  multiplyAttrs(rewriter, attr, multiplicativeFactor);
+              auto addAttr = multiplyAttrs(rewriter, attr, additiveFactor);
+              indVarMap[val] = std::make_tuple(baseVar, mulAttr, addAttr);
+            }
+            // Handle the case where the lhs is just a cast of induction var
+            else {
+              indVarMap[val] = std::make_tuple(
+                  lhs, attr, rewriter.getZeroAttr(attr.getType()));
+            }
           }
         }
       }
@@ -104,8 +194,20 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
             auto attr = c_op.getValue();
 
             auto out_type = val.getType();
-            indVarMap[val] =
-                std::make_tuple(lhs, rewriter.getOneAttr(out_type), attr);
+
+            auto [baseVar, multiplicativeFactor, additiveFactor] =
+                indVarMap[lhs];
+
+            if (multiplicativeFactor.getType() == attr.getType()) {
+              auto addAttr = addAttrs(rewriter, attr, additiveFactor);
+              indVarMap[val] =
+                  std::make_tuple(baseVar, multiplicativeFactor, addAttr);
+            }
+            // Handles the cast from a induction var.
+            else {
+              indVarMap[val] = std::make_tuple(
+                  lhs, rewriter.getOneAttr(attr.getType()), attr);
+            }
           }
         }
       }
@@ -130,16 +232,6 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
           }
         }
       }
-
-      // check if any induction var is used in memref.store
-      if (auto storeOp = llvm::dyn_cast<memref::StoreOp>(elt)) {
-        auto storing_value = storeOp.getValueToStore();
-
-        if (indVarMap.count(storing_value)) {
-          auto store_value = storeOp.getMemRef();
-          indVarMap[store_value] = indVarMap[storing_value];
-        }
-      }
     }
 
     for (const auto &[key, value] : indVarMap) {
@@ -148,7 +240,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                 llvm::dyn_cast_if_present<arith::MulIOp>(key.getDefiningOp())) {
           auto resultType = mulOp.getType();
 
-          auto attr = std::get<2>(value);
+          auto additiveFactor = std::get<2>(value);
 
           auto newYieldValuesFn = [&](OpBuilder &rewriter, Location loc,
                                       ArrayRef<BlockArgument> newBbArgs)
@@ -157,20 +249,20 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
 
             auto resultType = currentAcc.getType();
 
-            auto attr = std::get<1>(value);
+            auto multiplicativeFactor = std::get<1>(value);
 
             // We Update the accumulator exactly before the yield.
             rewriter.setInsertionPoint(op.getBody()->getTerminator());
 
             auto additionFactor = arith::ConstantOp::create(
-                rewriter, op.getLoc(), resultType, attr);
+                rewriter, op.getLoc(), resultType, multiplicativeFactor);
 
             auto newAcc = arith::AddIOp::create(rewriter, loc, currentAcc,
                                                 additionFactor);
             return {newAcc};
           };
-          auto accumulator = arith::ConstantOp::create(rewriter, op.getLoc(),
-                                                       resultType, attr);
+          auto accumulator = arith::ConstantOp::create(
+              rewriter, op.getLoc(), resultType, additiveFactor);
 
           rewriter.replaceAllOpUsesWith(mulOp, accumulator);
           rewriter.eraseOp(mulOp);
