@@ -36,7 +36,7 @@ mlir::TypedAttr multiplyAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto product = opOneValue * opTwoValue;
 
-    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), product);
+    return IntegerAttr::get(intOpOne.getType(), product);
   } else if (llvm::isa<FloatAttr>(opOne)) {
 
     auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
@@ -48,7 +48,7 @@ mlir::TypedAttr multiplyAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto product = opOneValue * opTwoValue;
 
-    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), product);
+    return FloatAttr::get(intOpOne.getType(), product);
   } else
     return {};
 }
@@ -65,7 +65,7 @@ mlir::TypedAttr addAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto sum = opOneValue + opTwoValue;
 
-    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), sum);
+    return IntegerAttr::get(intOpOne.getType(), sum);
   } else if (llvm::isa<FloatAttr>(opOne)) {
 
     auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
@@ -77,7 +77,7 @@ mlir::TypedAttr addAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto sum = opOneValue + opTwoValue;
 
-    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), sum);
+    return FloatAttr::get(intOpOne.getType(), sum);
   } else
     return {};
 }
@@ -94,7 +94,7 @@ mlir::TypedAttr subAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto diff = opOneValue - opTwoValue;
 
-    return rewriter.getAttr<IntegerAttr>(intOpOne.getType(), diff);
+    return IntegerAttr::get(intOpOne.getType(), diff);
   } else if (llvm::isa<FloatAttr>(opOne)) {
 
     auto intOpOne = llvm::dyn_cast<FloatAttr>(opOne);
@@ -106,7 +106,7 @@ mlir::TypedAttr subAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     // let it truncate
     auto diff = opOneValue - opTwoValue;
 
-    return rewriter.getAttr<FloatAttr>(intOpOne.getType(), diff);
+    return FloatAttr::get(intOpOne.getType(), diff);
   } else
     return {};
 }
