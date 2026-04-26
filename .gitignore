@@ -1,3 +1,5 @@
 */build
 */cmake-build-debug
 .cache
+examples/*/obj_dir
+examples/*/.*
