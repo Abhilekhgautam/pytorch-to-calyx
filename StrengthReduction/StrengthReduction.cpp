@@ -144,10 +144,60 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
         auto in = elt.getOperand(0);
         if (indVarMap.count(in)) {
 
-          auto v = elt.getResult(0);
-          auto out_type = v.getType();
-          indVarMap[v] = std::make_tuple(v, rewriter.getOneAttr(out_type),
-                                         rewriter.getZeroAttr(out_type));
+//             return {newAcc};
+//           };
+//           auto accumulator = arith::ConstantOp::create(
+//               rewriter, op.getLoc(), resultType, additiveFactor);
+
+//           rewriter.replaceAllOpUsesWith(mulOp, accumulator);
+//           rewriter.eraseOp(mulOp);
+
+//           return op.replaceWithAdditionalYields(rewriter, {accumulator},
+//           true,
+//                                                 newYieldValuesFn);
+//         }
+//       }
+//     }
+
+//     return failure();
+//   }
+// };
+using IndVarMap =
+    llvm::MapVector<mlir::Value,
+                    std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>;
+
+void processAddOp(arith::AddIOp addOp, OpBuilder &builder,
+                  IndVarMap &indVarMap) {
+  IndVarMap localMap = indVarMap;
+  auto lhs = addOp.getLhs();
+  auto rhs = addOp.getRhs();
+
+  if (indVarMap.count(lhs) && indVarMap.count(rhs)) {
+    {
+      std::lock_guard<std::mutex> lock(printMutex);
+      llvm::outs() << "Both lhs and rhs are induction var.\n";
+      addOp.dump();
+    }
+    auto [baseVarL, mulFactorL, addFactorL] = localMap[lhs];
+    auto [baseVarR, mulFactorR, addFactorR] = localMap[rhs];
+
+    if (baseVarL == baseVarR) {
+      auto combinedMul = addAttrs(builder, mulFactorL, mulFactorR);
+      auto combinedAdd = addAttrs(builder, addFactorL, addFactorR);
+
+      localMap[addOp.getResult()] =
+          std::make_tuple(baseVarL, combinedMul, combinedAdd);
+    } else {
+
+      auto parent = addOp->getParentOfType<scf::ForOp>();
+      bool isLoopInvariant = parent.isDefinedOutsideOfLoop(lhs);
+
+      if (isLoopInvariant) {
+        {
+          std::lock_guard<std::mutex> lock(printMutex);
+          llvm::outs() << "LHS not a indVar but the rhs is.\n";
+
+          addOp.getResult().dump();
         }
       }
       // check for k = j * b , where j is an inductionVar and b is a constant
