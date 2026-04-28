@@ -8,7 +8,7 @@
 
 namespace mlir {
 void registerStrengthReductionPass() {
-  PassRegistration<StrengthReductionPass>();
+  PassRegistration<SCFStrengthReductionPass>();
 }
 } // namespace mlir
 
