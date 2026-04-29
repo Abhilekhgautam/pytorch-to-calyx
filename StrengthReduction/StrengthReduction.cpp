@@ -5,10 +5,12 @@
 
 #include "StrengthReduction.h"
 #include <llvm/ADT/ArrayRef.h>
+#include <llvm/ADT/DenseMap.h>
 #include <llvm/ADT/DenseSet.h>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/Casting.h>
+#include <llvm/Support/raw_ostream.h>
 #include <mlir/Dialect/Arith/IR/Arith.h>
 #include <mlir/IR/Attributes.h>
 #include <mlir/IR/Builders.h>
@@ -20,9 +22,12 @@
 #include <mlir/IR/Value.h>
 #include <mlir/Support/LLVM.h>
 
+#include <mutex>
 #include <tuple>
 
 using namespace mlir;
+
+std::mutex printMutex;
 
 mlir::TypedAttr multiplyAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
                               mlir::TypedAttr opTwo) {
@@ -120,6 +125,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
     llvm::MapVector<mlir::Value,
                     std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>
         indVarMap;
+    llvm::DenseMap<mlir::Value, mlir::Value> runtimeAddFactorMap;
 
     // scf.for always has one induction var, the iteration variable.
     auto iterationVar = op.getInductionVar();
@@ -133,6 +139,36 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
     indVarMap[iterationVar] = std::make_tuple(
         iterationVar, rewriter.getOneAttr(iterationVar.getType()),
         rewriter.getZeroAttr(iterationVar.getType()));
+
+    if (auto yieldOp =
+            llvm::dyn_cast<scf::YieldOp>(op.getBody()->getTerminator())) {
+
+      for (auto [iterArg, initialVal, yieldedVal] :
+           llvm::zip(op.getRegionIterArgs(), op.getInitArgs(),
+                     yieldOp.getOperands())) {
+
+        if (auto addOp = llvm::dyn_cast_if_present<arith::AddIOp>(
+                yieldedVal.getDefiningOp())) {
+
+          auto lhs = addOp.getLhs();
+          auto rhs = addOp.getRhs();
+
+          if (lhs == iterArg) {
+            if (auto constantOp =
+                    llvm::dyn_cast<arith::ConstantOp>(rhs.getDefiningOp())) {
+
+              if (auto initConstantOp =
+                      llvm::dyn_cast_if_present<arith::ConstantOp>(
+                          initialVal.getDefiningOp())) {
+
+                indVarMap[lhs] = std::make_tuple(lhs, constantOp.getValue(),
+                                                 initConstantOp.getValue());
+              }
+            }
+          }
+        }
+      }
+    }
 
     auto body = op.getBody();
 
@@ -151,7 +187,8 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
         }
       }
       // check for k = j * b , where j is an inductionVar and b is a constant
-      if (auto mulOp = llvm::dyn_cast<arith::MulIOp>(elt)) {
+      else if (auto mulOp = llvm::dyn_cast<arith::MulIOp>(elt)) {
+
         auto lhs = mulOp.getLhs();
         auto rhs = mulOp.getRhs();
 
@@ -163,6 +200,19 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
             auto val = mulOp.getResult();
             auto attr = c_op.getValue();
 
+            if (runtimeAddFactorMap.count(lhs)) {
+              rewriter.setInsertionPoint(op);
+              auto runtimeBase = runtimeAddFactorMap[lhs];
+              auto resultType = mulOp.getResult().getType();
+
+              auto mulFactor = arith::ConstantOp::create(rewriter, op.getLoc(),
+                                                         resultType, attr);
+              auto runtimeInitial = arith::MulIOp::create(
+                  rewriter, op.getLoc(), runtimeBase, mulFactor);
+
+              runtimeAddFactorMap[val] = runtimeInitial;
+            }
+
             auto [baseVar, multiplicativeFactor, additiveFactor] =
                 indVarMap[lhs];
 
@@ -171,6 +221,9 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                   multiplyAttrs(rewriter, attr, multiplicativeFactor);
               auto addAttr = multiplyAttrs(rewriter, attr, additiveFactor);
               indVarMap[val] = std::make_tuple(baseVar, mulAttr, addAttr);
+              // if (runtimeAddFactorMap.count(lhs)) {
+              //   runtimeAddFactorMap[val] = runtimeAddFactorMap[lhs];
+              // }
             }
             // Handle the case where the lhs is just a cast of induction var
             else {
@@ -185,8 +238,41 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
         auto lhs = addOp.getLhs();
         auto rhs = addOp.getRhs();
 
+        // If one of the args is loop invariant
+        if (indVarMap.count(rhs) && op.isDefinedOutsideOfLoop(lhs)) {
+          if (auto arg = llvm::dyn_cast<mlir::BlockArgument>(lhs)) {
+            if (auto parentFor =
+                    llvm::dyn_cast<scf::ForOp>(arg.getOwner()->getParentOp())) {
+              auto initVal = parentFor.getInitArgs()[arg.getArgNumber() - 1];
+
+              if (auto constOp = llvm::dyn_cast_if_present<arith::ConstantOp>(
+                      initVal.getDefiningOp())) {
+                auto attr = constOp.getValue();
+
+                auto val = addOp.getResult();
+
+                auto out_type = val.getType();
+
+                auto [baseVar, multiplicativeFactor, additiveFactor] =
+                    indVarMap[rhs];
+
+                if (multiplicativeFactor.getType() == attr.getType()) {
+                  auto addAttr = addAttrs(rewriter, attr, additiveFactor);
+                  indVarMap[val] =
+                      std::make_tuple(baseVar, multiplicativeFactor, addAttr);
+                  runtimeAddFactorMap[val] = lhs;
+                }
+                // Handles the cast from a induction var.
+                else {
+                  indVarMap[val] = std::make_tuple(
+                      lhs, rewriter.getOneAttr(attr.getType()), attr);
+                }
+              }
+            }
+          }
+        }
         // Check if lhs is an induction var
-        if (indVarMap.count(lhs)) {
+        else if (indVarMap.count(lhs)) {
           // Check if rhs is an constant op
           if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
                   rhs.getDefiningOp())) {
@@ -208,27 +294,6 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
               indVarMap[val] = std::make_tuple(
                   lhs, rewriter.getOneAttr(attr.getType()), attr);
             }
-          }
-        }
-      }
-
-      // check for k = j - b
-      else if (auto subOp = llvm::dyn_cast<arith::SubIOp>(elt)) {
-        auto lhs = subOp.getLhs();
-        auto rhs = subOp.getRhs();
-
-        // Check if lhs is an induction var
-        if (indVarMap.count(lhs)) {
-          // Check if rhs is an constant op
-          if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
-                  rhs.getDefiningOp())) {
-            auto val = subOp.getResult();
-            auto attr = c_op.getValue();
-
-            auto out_type = val.getType();
-
-            indVarMap[val] =
-                std::make_tuple(lhs, rewriter.getOneAttr(out_type), attr);
           }
         }
       }
@@ -261,9 +326,14 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                                                 additionFactor);
             return {newAcc};
           };
-          auto accumulator = arith::ConstantOp::create(
-              rewriter, op.getLoc(), resultType, additiveFactor);
+          mlir::Value accumulator;
+          if (runtimeAddFactorMap.count(key)) {
+            accumulator = runtimeAddFactorMap[key];
+          } else {
 
+            accumulator = arith::ConstantOp::create(rewriter, op.getLoc(),
+                                                    resultType, additiveFactor);
+          }
           rewriter.replaceAllOpUsesWith(mulOp, accumulator);
           rewriter.eraseOp(mulOp);
 
