@@ -271,6 +271,39 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
             }
           }
         }
+
+        if (indVarMap.count(lhs) && op.isDefinedOutsideOfLoop(rhs)) {
+          if (auto arg = llvm::dyn_cast<mlir::BlockArgument>(rhs)) {
+            if (auto parentFor =
+                    llvm::dyn_cast<scf::ForOp>(arg.getOwner()->getParentOp())) {
+              auto initVal = parentFor.getInitArgs()[arg.getArgNumber() - 1];
+
+              if (auto constOp = llvm::dyn_cast_if_present<arith::ConstantOp>(
+                      initVal.getDefiningOp())) {
+                auto attr = constOp.getValue();
+
+                auto val = addOp.getResult();
+
+                auto out_type = val.getType();
+
+                auto [baseVar, multiplicativeFactor, additiveFactor] =
+                    indVarMap[lhs];
+
+                if (multiplicativeFactor.getType() == attr.getType()) {
+                  auto addAttr = addAttrs(rewriter, attr, additiveFactor);
+                  indVarMap[val] =
+                      std::make_tuple(baseVar, multiplicativeFactor, addAttr);
+                  runtimeAddFactorMap[val] = rhs;
+                }
+                // Handles the cast from a induction var.
+                else {
+                  indVarMap[val] = std::make_tuple(
+                      rhs, rewriter.getOneAttr(attr.getType()), attr);
+                }
+              }
+            }
+          }
+        }
         // Check if lhs is an induction var
         else if (indVarMap.count(lhs)) {
           // Check if rhs is an constant op
