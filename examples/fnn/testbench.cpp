@@ -168,6 +168,8 @@ int main(int argc, char** argv) {
 
     if (!done_seen) printf("TIMEOUT after %d cycles\n", MAX_CYCLES);
 
+    printf("Simulation Complete.\n Took %d cycles\n", cycle);
+
     printf("\n=== Memory contents after simulation ===\n");
     for (int i = 0; i < 10; i++) {
         printf("mem0[%2d]=%08X  mem1[%2d]=%08X  mem2[%2d]=%08X  mem3[%2d]=%08X  mem4[%2d]=%08X\n",
