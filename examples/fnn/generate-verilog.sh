@@ -53,7 +53,7 @@ if [ "$SKIP_STRENGTH_REDUCE" = true ]; then
              --buffer-results-to-out-params \
              --canonicalize \
              --cse | \
-   ~/pytorch-to-calyx/MemrefCopyToAffineLoop/build/MemrefCopyToAffineLoop --memref_copy_to_affine --arith-expand --lower-affine| \
+   ~/pytorch-to-calyx/MemrefCopyToAffineLoop/build/MemrefCopyToAffineLoop --memref_copy_to_affine --arith-expand --lower-affine | \
    ~/os-contrib/circt/build/bin/circt-opt --lower-scf-to-calyx="top-level-function=forward write-json=non-reduced-data" | \
    ~/os-contrib/circt/build/bin/circt-translate --export-calyx | \
    fud2 --from calyx -o "$OUTPUT_FILE"
@@ -76,7 +76,8 @@ else
              --loop-invariant-code-motion \
              --canonicalize \
              --cse | \
-        ~/pytorch-to-calyx/StrengthReduction/build/StrengthReduction --strength-reduce --scf-for-to-while | \
+        ~/pytorch-to-calyx/StrengthReduction/build/StrengthReduction --strength-reduce | \
+        mlir-opt --scf-for-to-while | \
         ~/os-contrib/circt/build/bin/circt-opt --lower-scf-to-calyx="top-level-function=forward write-json=reduced-data" | \
         ~/os-contrib/circt/build/bin/circt-translate --export-calyx | \
         fud2 --from calyx -o "$OUTPUT_FILE"

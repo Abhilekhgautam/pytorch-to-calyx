@@ -3,3 +3,4 @@
 .cache
 examples/*/obj_dir
 examples/*/.*
+examples/*/data/*
