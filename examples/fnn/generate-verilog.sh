@@ -44,17 +44,24 @@ if [ "$SKIP_STRENGTH_REDUCE" = true ]; then
     echo "Running pipeline WITHOUT strength reduction..."
     mlir-opt "$INPUT_FILE" \
         -convert-linalg-to-affine-loops \
+        --affine-loop-coalescing \
         --lower-affine \
-        --loop-invariant-code-motion \
+        --int-range-optimizations \
         --canonicalize \
-        --cse | \
+        --cse \
+        --arith-expand | \
     ~/os-contrib/circt/build/bin/circt-opt --flatten-memref | \
     mlir-opt --symbol-privatize \
              --buffer-results-to-out-params \
              --canonicalize \
              --cse | \
-   ~/pytorch-to-calyx/MemrefCopyToAffineLoop/build/MemrefCopyToAffineLoop --memref_copy_to_affine --arith-expand --lower-affine | \
-   ~/os-contrib/circt/build/bin/circt-opt --lower-scf-to-calyx="top-level-function=forward write-json=non-reduced-data" | \
+   ~/pytorch-to-calyx/MemrefCopyToAffineLoop/build/MemrefCopyToAffineLoop --memref_copy_to_affine \
+   --affine-loop-coalescing \
+   --lower-affine \
+   --int-range-optimizations | \
+
+   ~/pytorch-to-calyx/SimplifyAddressCalculation/build/SimplifyAddressCalculation --simplify-address-calculation | tee simplified.mlir | \
+   ~/os-contrib/circt/build/bin/circt-opt --lower-scf-to-calyx="top-level-function=forward write-json=data" | \
    ~/os-contrib/circt/build/bin/circt-translate --export-calyx | \
    fud2 --from calyx -o "$OUTPUT_FILE"
 else
