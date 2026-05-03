@@ -6,17 +6,23 @@
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/ADT/DenseMap.h>
 #include <llvm/ADT/DenseSet.h>
+#include <llvm/ADT/MapVector.h>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/Casting.h>
+#include <llvm/Support/LogicalResult.h>
 #include <llvm/Support/raw_ostream.h>
 #include <mlir/Dialect/Arith/IR/Arith.h>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/Dialect/Utils/StaticValueUtils.h>
 #include <mlir/IR/Attributes.h>
 #include <mlir/IR/Builders.h>
 #include <mlir/IR/BuiltinAttributeInterfaces.h>
 #include <mlir/IR/BuiltinAttributes.h>
 #include <mlir/IR/Location.h>
 #include <mlir/IR/Matchers.h>
+#include <mlir/IR/Operation.h>
+#include <mlir/IR/PDLPatternMatch.h.inc>
 #include <mlir/IR/Types.h>
 #include <mlir/IR/Value.h>
 #include <mlir/Support/LLVM.h>
@@ -62,6 +68,77 @@ struct MemRefIndexRewritePattern : public OpRewritePattern<arith::AddIOp> {
               // All checks passed, replace all uses with div_lhs
               rewriter.replaceAllOpUsesWith(op, div_lhs);
               return success();
+            }
+          }
+        }
+      }
+    }
+
+    return failure();
+  }
+};
+
+struct RemDivRewritePattern : public OpRewritePattern<scf::ForOp> {
+  using OpRewritePattern<scf::ForOp>::OpRewritePattern;
+
+  // Find this pattern:
+  // ========================
+  // %0 = arith.remsi %arg4, %c56 : index
+  // %1 = arith.divsi %arg4, %c56 : index
+  // %2 = arith.remsi %1, %c76 : index
+  // %3 = arith.divsi %1, %c76 : index
+  // ========================
+  // and add an iter arg to the scf::for
+  LogicalResult matchAndRewrite(scf::ForOp forOp,
+                                PatternRewriter &rewriter) const override {
+
+    auto indVar = forOp.getInductionVar();
+    auto step = forOp.getStep();
+
+    llvm::MapVector<int64_t, std::pair<arith::RemSIOp, arith::DivSIOp>>
+        dimensionMap;
+
+    auto body = forOp.getBody();
+
+    for (auto &op : *body) {
+      if (auto remOp = llvm::dyn_cast_if_present<arith::RemSIOp>(op)) {
+        auto remLhs = remOp.getLhs();
+        auto remRhs = remOp.getRhs();
+
+        if (remLhs == indVar) {
+          if (auto constOp = getConstantIntValue(remRhs); constOp.has_value()) {
+            // TODO: maybe add to vector later.
+            dimensionMap[*constOp].first = remOp;
+          }
+        } else {
+          // Maybe the lhs is the result of division
+          if (auto divResult =
+                  llvm::dyn_cast_if_present<arith::DivSIOp>(remLhs)) {
+
+            if (auto constOp = getConstantIntValue(remRhs);
+                constOp.has_value()) {
+              dimensionMap[*constOp].first = remOp;
+            }
+          }
+        }
+      } else if (auto divOp = llvm::dyn_cast_if_present<arith::DivSIOp>(op)) {
+        auto divLhs = divOp.getLhs();
+        auto divRhs = divOp.getRhs();
+
+        if (divLhs == indVar) {
+          if (auto constOp = getConstantIntValue(divRhs); constOp.has_value()) {
+            dimensionMap[*constOp].second = divOp;
+          }
+        } else {
+          // Maybe the the lhs is the result of previous div
+          // Maybe we'll check its presence in the vector or better
+          if (auto divResult =
+                  llvm::dyn_cast_if_present<arith::DivSIOp>(divLhs)) {
+
+            if (auto constOp = getConstantIntValue(divRhs);
+                constOp.has_value()) {
+              // TODO: maybe add to vector later
+              dimensionMap[*constOp].second = divOp;
             }
           }
         }
