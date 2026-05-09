@@ -22,7 +22,9 @@
 #include <mlir/IR/Value.h>
 #include <mlir/Support/LLVM.h>
 
+#include <iostream>
 #include <mutex>
+#include <stdexcept>
 #include <tuple>
 
 using namespace mlir;
@@ -116,6 +118,139 @@ mlir::TypedAttr subAttrs(PatternRewriter &rewriter, mlir::TypedAttr opOne,
     return {};
 }
 
+using IndVarMap =
+    llvm::MapVector<mlir::Value,
+                    std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>;
+using RunTimeMap = llvm::DenseMap<mlir::Value, mlir::Value>;
+
+/*
+ * Handles the form : indvar, const_op
+ *
+ * The const_op can be either a constantOp or Block Argument.
+ */
+void handleDefaultForm(PatternRewriter &rewriter, scf::ForOp forOp,
+                       Operation *op, mlir::Value lhs, mlir::Value rhs,
+                       RunTimeMap &runtimeAddFactorMap, IndVarMap &indVarMap,
+                       SmallVector<Operation *> &speculativeOps) {
+
+  // Handle the Multiply Operation
+  if (auto mulOp = llvm::dyn_cast_if_present<arith::MulIOp>(op)) {
+    // Check if RHS is a constantOp.
+    if (auto constOp =
+            llvm::dyn_cast_if_present<arith::ConstantOp>(rhs.getDefiningOp())) {
+
+      auto val = mulOp.getResult();
+      auto attr = constOp.getValue();
+
+      auto [baseVar, multiplicativeFactor, additiveFactor] = indVarMap[lhs];
+
+      if (additiveFactor.getType() == attr.getType()) {
+        if (baseVar != forOp.getInductionVar()) {
+
+          auto mulAttr = multiplyAttrs(rewriter, attr, multiplicativeFactor);
+          auto addAttr = multiplyAttrs(rewriter, attr, additiveFactor);
+          indVarMap[val] = std::make_tuple(baseVar, mulAttr, addAttr);
+        } else {
+
+          indVarMap[val] =
+              std::make_tuple(lhs, attr, rewriter.getZeroAttr(lhs.getType()));
+        }
+      }
+      // Handle the case where the lhs is just a cast of induction var
+      else {
+        indVarMap[val] =
+            std::make_tuple(lhs, attr, rewriter.getZeroAttr(attr.getType()));
+      }
+
+      if (runtimeAddFactorMap.contains(lhs)) {
+        rewriter.setInsertionPoint(forOp);
+        auto runtimeBase = runtimeAddFactorMap[lhs];
+        auto resultType = mulOp.getResult().getType();
+
+        auto mulFactor = arith::ConstantOp::create(rewriter, mulOp.getLoc(),
+                                                   resultType, attr);
+        speculativeOps.push_back(mulFactor);
+        auto runtimeInitial = arith::MulIOp::create(rewriter, mulOp.getLoc(),
+                                                    runtimeBase, mulFactor);
+
+        speculativeOps.push_back(runtimeInitial);
+        runtimeAddFactorMap[val] = runtimeInitial;
+      }
+
+    }
+    // Check if RHS is a loop invariant.
+    else if (forOp.isDefinedOutsideOfLoop(rhs)) {
+      throw std::runtime_error("RHS of mulOp not a constant yikes!");
+    }
+  }
+  // Handle the Addition Operation
+  else if (auto addOp = llvm::dyn_cast_if_present<arith::AddIOp>(op)) {
+    // Check if RHS is a Constant Literal
+    if (auto constOp =
+            llvm::dyn_cast_if_present<arith::ConstantOp>(rhs.getDefiningOp())) {
+
+      auto val = addOp.getResult();
+      auto attr = constOp.getValue();
+
+      // if (runtimeAddFactorMap.count(lhs)) {
+      //   rewriter.setInsertionPoint(op);
+      //   auto runtimeBase = runtimeAddFactorMap[lhs];
+      //   auto resultType = addOp.getResult().getType();
+
+      //   auto mulFactor = arith::ConstantOp::create(rewriter, addOp.getLoc(),
+      //                                              resultType, attr);
+      //   auto runtimeInitial = arith::MulIOp::create(rewriter, addOp.getLoc(),
+      //                                               runtimeBase, mulFactor);
+
+      //   runtimeAddFactorMap[val] = runtimeInitial;
+      // }
+
+      auto [baseVar, multiplicativeFactor, additiveFactor] = indVarMap[lhs];
+
+      if (additiveFactor.getType() == attr.getType()) {
+        // auto mulAttr = multiplyAttrs(rewriter, attr, multiplicativeFactor);
+        auto addAttr = addAttrs(rewriter, attr, additiveFactor);
+        indVarMap[val] =
+            std::make_tuple(baseVar, multiplicativeFactor, addAttr);
+      }
+      // Handle the case where the lhs is just a cast of induction var
+      else {
+        indVarMap[val] =
+            std::make_tuple(lhs, rewriter.getOneAttr(attr.getType()), attr);
+      }
+    }
+    // Check if RHS is a loop invariant
+    else if (forOp.isDefinedOutsideOfLoop(rhs)) {
+
+      auto [baseVar, mulFactor, addFactor] = indVarMap[lhs];
+
+      indVarMap[addOp.getResult()] =
+          std::make_tuple(baseVar, mulFactor, addFactor);
+
+      if (runtimeAddFactorMap.contains(lhs)) [[likely]] {
+
+        rewriter.setInsertionPoint(forOp);
+        auto addFactor = runtimeAddFactorMap[lhs];
+
+        auto newFactor =
+            arith::AddIOp::create(rewriter, op->getLoc(), addFactor, rhs);
+
+        speculativeOps.push_back(newFactor);
+
+        runtimeAddFactorMap[addOp.getResult()] = newFactor;
+      } else {
+        runtimeAddFactorMap[addOp.getResult()] = rhs;
+      }
+    }
+  }
+}
+
+void handleBothIndVar(Operation *op) {
+  throw std::runtime_error("Unimplemented block called!");
+}
+
+void handleNoneIndVar(Operation *op, IndVarMap &indVarMap) { return; }
+
 struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
   using OpRewritePattern<scf::ForOp>::OpRewritePattern;
 
@@ -126,6 +261,8 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                     std::tuple<mlir::Value, mlir::TypedAttr, mlir::TypedAttr>>
         indVarMap;
     llvm::DenseMap<mlir::Value, mlir::Value> runtimeAddFactorMap;
+
+    SmallVector<Operation *> speculativeOps;
 
     // scf.for always has one induction var, the iteration variable.
     auto iterationVar = op.getInductionVar();
@@ -172,6 +309,8 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
 
     auto body = op.getBody();
 
+    enum struct OpForm : uint8_t { Default, BothIndVar, NoneIndVar };
+
     for (auto &elt : *body) {
 
       if (llvm::isa<arith::IndexCastOp, arith::TruncIOp, arith::ExtSIOp,
@@ -189,145 +328,78 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
       // check for k = j * b , where j is an inductionVar and b is a constant
       else if (auto mulOp = llvm::dyn_cast<arith::MulIOp>(elt)) {
 
+        OpForm form = OpForm::Default;
+
         auto lhs = mulOp.getLhs();
         auto rhs = mulOp.getRhs();
 
-        // Check if lhs is an induction var
-        if (indVarMap.count(lhs)) {
-          // Check if rhs is an constant op
-          if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
-                  rhs.getDefiningOp())) {
-            auto val = mulOp.getResult();
-            auto attr = c_op.getValue();
+        // We'll always form on one of these form:
+        // %result = %ind_var, %const_op
+        // %result = %ind_var1, %ind_var2
+        // %result = %const_op1, %const_op2
 
-            if (runtimeAddFactorMap.count(lhs)) {
-              rewriter.setInsertionPoint(op);
-              auto runtimeBase = runtimeAddFactorMap[lhs];
-              auto resultType = mulOp.getResult().getType();
+        // Swap to have lhs as induction Variable.
+        if (indVarMap.contains(rhs) && !indVarMap.contains(lhs)) {
+          std::swap(lhs, rhs);
+        }
+        // This is case 2. Perfectly okay.
+        else if (indVarMap.contains(lhs) && indVarMap.contains(rhs)) {
+          form = OpForm::BothIndVar;
+        }
+        // Both operand can be constant.
+        else if (!indVarMap.contains(lhs) && !indVarMap.contains(rhs)) {
+          form = OpForm::NoneIndVar;
+        }
 
-              auto mulFactor = arith::ConstantOp::create(rewriter, op.getLoc(),
-                                                         resultType, attr);
-              auto runtimeInitial = arith::MulIOp::create(
-                  rewriter, op.getLoc(), runtimeBase, mulFactor);
-
-              runtimeAddFactorMap[val] = runtimeInitial;
-            }
-
-            auto [baseVar, multiplicativeFactor, additiveFactor] =
-                indVarMap[lhs];
-
-            if (additiveFactor.getType() == attr.getType()) {
-              auto mulAttr =
-                  multiplyAttrs(rewriter, attr, multiplicativeFactor);
-              auto addAttr = multiplyAttrs(rewriter, attr, additiveFactor);
-              indVarMap[val] = std::make_tuple(baseVar, mulAttr, addAttr);
-              // if (runtimeAddFactorMap.count(lhs)) {
-              //   runtimeAddFactorMap[val] = runtimeAddFactorMap[lhs];
-              // }
-            }
-            // Handle the case where the lhs is just a cast of induction var
-            else {
-              indVarMap[val] = std::make_tuple(
-                  lhs, attr, rewriter.getZeroAttr(attr.getType()));
-            }
-          }
+        switch (form) {
+        case OpForm::Default:
+          handleDefaultForm(rewriter, op, mulOp, lhs, rhs, runtimeAddFactorMap,
+                            indVarMap, speculativeOps);
+          break;
+        case OpForm::BothIndVar:
+          handleBothIndVar(mulOp);
+          break;
+        case OpForm::NoneIndVar:
+          handleNoneIndVar(mulOp, indVarMap);
+          break;
         }
       }
       // check for k = j + b
       else if (auto addOp = llvm::dyn_cast<arith::AddIOp>(elt)) {
+
+        OpForm form = OpForm::Default;
         auto lhs = addOp.getLhs();
         auto rhs = addOp.getRhs();
 
-        // If one of the args is loop invariant
-        if (indVarMap.count(rhs) && op.isDefinedOutsideOfLoop(lhs)) {
-          if (auto arg = llvm::dyn_cast<mlir::BlockArgument>(lhs)) {
-            if (auto parentFor =
-                    llvm::dyn_cast<scf::ForOp>(arg.getOwner()->getParentOp())) {
-              auto initVal = parentFor.getInitArgs()[arg.getArgNumber() - 1];
+        // We'll always form on one of these form:
+        // %result = %ind_var, %const_op
+        // %result = %ind_var1, %ind_var2
+        // %result = %const_op1, %const_op2
 
-              if (auto constOp = llvm::dyn_cast_if_present<arith::ConstantOp>(
-                      initVal.getDefiningOp())) {
-                auto attr = constOp.getValue();
-
-                auto val = addOp.getResult();
-
-                auto out_type = val.getType();
-
-                auto [baseVar, multiplicativeFactor, additiveFactor] =
-                    indVarMap[rhs];
-
-                if (multiplicativeFactor.getType() == attr.getType()) {
-                  auto addAttr = addAttrs(rewriter, attr, additiveFactor);
-                  indVarMap[val] =
-                      std::make_tuple(baseVar, multiplicativeFactor, addAttr);
-                  runtimeAddFactorMap[val] = lhs;
-                }
-                // Handles the cast from a induction var.
-                else {
-                  indVarMap[val] = std::make_tuple(
-                      lhs, rewriter.getOneAttr(attr.getType()), attr);
-                }
-              }
-            }
-          }
+        // Swap to have lhs as induction Variable.
+        if (indVarMap.contains(rhs) && !indVarMap.contains(lhs)) {
+          std::swap(lhs, rhs);
+        }
+        // This is case 2. Perfectly okay.
+        else if (indVarMap.contains(lhs) && indVarMap.contains(rhs)) {
+          form = OpForm::BothIndVar;
+        }
+        // Both operand can be constant.
+        else if (!indVarMap.contains(lhs) && !indVarMap.contains(rhs)) {
+          form = OpForm::NoneIndVar;
         }
 
-        if (indVarMap.count(lhs) && op.isDefinedOutsideOfLoop(rhs)) {
-          if (auto arg = llvm::dyn_cast<mlir::BlockArgument>(rhs)) {
-            if (auto parentFor =
-                    llvm::dyn_cast<scf::ForOp>(arg.getOwner()->getParentOp())) {
-              auto initVal = parentFor.getInitArgs()[arg.getArgNumber() - 1];
-
-              if (auto constOp = llvm::dyn_cast_if_present<arith::ConstantOp>(
-                      initVal.getDefiningOp())) {
-                auto attr = constOp.getValue();
-
-                auto val = addOp.getResult();
-
-                auto out_type = val.getType();
-
-                auto [baseVar, multiplicativeFactor, additiveFactor] =
-                    indVarMap[lhs];
-
-                if (multiplicativeFactor.getType() == attr.getType()) {
-                  auto addAttr = addAttrs(rewriter, attr, additiveFactor);
-                  indVarMap[val] =
-                      std::make_tuple(baseVar, multiplicativeFactor, addAttr);
-                  runtimeAddFactorMap[val] = rhs;
-                }
-                // Handles the cast from a induction var.
-                else {
-                  indVarMap[val] = std::make_tuple(
-                      rhs, rewriter.getOneAttr(attr.getType()), attr);
-                }
-              }
-            }
-          }
-        }
-        // Check if lhs is an induction var
-        else if (indVarMap.count(lhs)) {
-          // Check if rhs is an constant op
-          if (auto c_op = llvm::dyn_cast_if_present<arith::ConstantOp>(
-                  rhs.getDefiningOp())) {
-            auto val = addOp.getResult();
-            auto attr = c_op.getValue();
-
-            auto out_type = val.getType();
-
-            auto [baseVar, multiplicativeFactor, additiveFactor] =
-                indVarMap[lhs];
-
-            if (multiplicativeFactor.getType() == attr.getType()) {
-              auto addAttr = addAttrs(rewriter, attr, additiveFactor);
-              indVarMap[val] =
-                  std::make_tuple(baseVar, multiplicativeFactor, addAttr);
-            }
-            // Handles the cast from a induction var.
-            else {
-              indVarMap[val] = std::make_tuple(
-                  lhs, rewriter.getOneAttr(attr.getType()), attr);
-            }
-          }
+        switch (form) {
+        case OpForm::Default:
+          handleDefaultForm(rewriter, op, addOp, lhs, rhs, runtimeAddFactorMap,
+                            indVarMap, speculativeOps);
+          break;
+        case OpForm::BothIndVar:
+          handleBothIndVar(addOp);
+          break;
+        case OpForm::NoneIndVar:
+          handleNoneIndVar(addOp, indVarMap);
+          break;
         }
       }
     }
@@ -336,6 +408,7 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
       if (key) {
         if (auto mulOp =
                 llvm::dyn_cast_if_present<arith::MulIOp>(key.getDefiningOp())) {
+
           auto resultType = mulOp.getType();
 
           auto additiveFactor = std::get<2>(value);
@@ -359,14 +432,15 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
                                                 additionFactor);
             return {newAcc};
           };
-          mlir::Value accumulator;
-          if (runtimeAddFactorMap.count(key)) {
-            accumulator = runtimeAddFactorMap[key];
-          } else {
+          rewriter.setInsertionPoint(op);
+          mlir::Value accumulator = arith::ConstantOp::create(
+              rewriter, op.getLoc(), resultType, additiveFactor);
 
-            accumulator = arith::ConstantOp::create(rewriter, op.getLoc(),
-                                                    resultType, additiveFactor);
+          if (runtimeAddFactorMap.count(key)) {
+            accumulator = arith::AddIOp::create(
+                rewriter, op.getLoc(), accumulator, runtimeAddFactorMap[key]);
           }
+
           rewriter.replaceAllOpUsesWith(mulOp, accumulator);
           rewriter.eraseOp(mulOp);
 
@@ -376,6 +450,10 @@ struct SCFLoopRewritePattern : public OpRewritePattern<scf::ForOp> {
       }
     }
 
+    // Erase all those ops:
+    for (auto *op : llvm::reverse(speculativeOps)) {
+      rewriter.eraseOp(op);
+    }
     return failure();
   }
 };
