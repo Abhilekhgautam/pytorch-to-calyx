@@ -1,0 +1,1768 @@
+module attributes {calyx.entrypoint = "main"} {
+  calyx.component @main(%clk: i1 {clk}, %reset: i1 {reset}, %go: i1 {go}) -> (%done: i1 {done}) {
+    %mem_9.addr0, %mem_9.clk, %mem_9.reset, %mem_9.content_en, %mem_9.write_en, %mem_9.write_data, %mem_9.read_data, %mem_9.done = calyx.seq_mem @mem_9 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %mem_8.addr0, %mem_8.clk, %mem_8.reset, %mem_8.content_en, %mem_8.write_en, %mem_8.write_data, %mem_8.read_data, %mem_8.done = calyx.seq_mem @mem_8 <[10944] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    %mem_7.addr0, %mem_7.clk, %mem_7.reset, %mem_7.content_en, %mem_7.write_en, %mem_7.write_data, %mem_7.read_data, %mem_7.done = calyx.seq_mem @mem_7 <[5472] x 32> [13] : i13, i1, i1, i1, i1, i32, i32, i1
+    %mem_6.addr0, %mem_6.clk, %mem_6.reset, %mem_6.content_en, %mem_6.write_en, %mem_6.write_data, %mem_6.read_data, %mem_6.done = calyx.seq_mem @mem_6 <[34048] x 32> [16] : i16, i1, i1, i1, i1, i32, i32, i1
+    %mem_5.addr0, %mem_5.clk, %mem_5.reset, %mem_5.content_en, %mem_5.write_en, %mem_5.write_data, %mem_5.read_data, %mem_5.done = calyx.seq_mem @mem_5 <[8] x 32> [3] : i3, i1, i1, i1, i1, i32, i32, i1
+    %mem_4.addr0, %mem_4.clk, %mem_4.reset, %mem_4.content_en, %mem_4.write_en, %mem_4.write_data, %mem_4.read_data, %mem_4.done = calyx.seq_mem @mem_4 <[600] x 32> [10] : i10, i1, i1, i1, i1, i32, i32, i1
+    %mem_3.addr0, %mem_3.clk, %mem_3.reset, %mem_3.content_en, %mem_3.write_en, %mem_3.write_data, %mem_3.read_data, %mem_3.done = calyx.seq_mem @mem_3 <[10944] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    %mem_2.addr0, %mem_2.clk, %mem_2.reset, %mem_2.content_en, %mem_2.write_en, %mem_2.write_data, %mem_2.read_data, %mem_2.done = calyx.seq_mem @mem_2 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %mem_1.addr0, %mem_1.clk, %mem_1.reset, %mem_1.content_en, %mem_1.write_en, %mem_1.write_data, %mem_1.read_data, %mem_1.done = calyx.seq_mem @mem_1 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %mem_0.addr0, %mem_0.clk, %mem_0.reset, %mem_0.content_en, %mem_0.write_en, %mem_0.write_data, %mem_0.read_data, %mem_0.done = calyx.seq_mem @mem_0 <[14400] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    %main_1_instance.clk, %main_1_instance.reset, %main_1_instance.go, %main_1_instance.done = calyx.instance @main_1_instance of @main_1 : i1, i1, i1, i1
+    calyx.wires {
+    }
+    calyx.control {
+      calyx.seq {
+        calyx.seq {
+          calyx.invoke @main_1_instance[arg_mem_0 = mem_0, arg_mem_1 = mem_1, arg_mem_2 = mem_2, arg_mem_3 = mem_3, arg_mem_4 = mem_4, arg_mem_5 = mem_5, arg_mem_6 = mem_6, arg_mem_7 = mem_7, arg_mem_8 = mem_8, arg_mem_9 = mem_9]() -> ()
+        }
+      }
+    }
+  } {toplevel}
+  calyx.component @main_1(%clk: i1 {clk}, %reset: i1 {reset}, %go: i1 {go}) -> (%done: i1 {done}) {
+    %true = hw.constant true
+    %false = hw.constant false
+    %cst = calyx.constant @cst_1 <0xFF800000 : f32> : i32
+    %cst_0 = calyx.constant @cst_0 <0.000000e+00 : f32> : i32
+    %c0_i32 = hw.constant 0 : i32
+    %c1_i32 = hw.constant 1 : i32
+    %c8_i32 = hw.constant 8 : i32
+    %c76_i32 = hw.constant 76 : i32
+    %c56_i32 = hw.constant 56 : i32
+    %c3_i32 = hw.constant 3 : i32
+    %c5_i32 = hw.constant 5 : i32
+    %c38_i32 = hw.constant 38 : i32
+    %c18_i32 = hw.constant 18 : i32
+    %c2_i32 = hw.constant 2 : i32
+    %c5472_i32 = hw.constant 5472 : i32
+    %c684_i32 = hw.constant 684 : i32
+    %c4256_i32 = hw.constant 4256 : i32
+    %c60_i32 = hw.constant 60 : i32
+    %c80_i32 = hw.constant 80 : i32
+    %c4800_i32 = hw.constant 4800 : i32
+    %c-1_i32 = hw.constant -1 : i32
+    %std_slice_23.in, %std_slice_23.out = calyx.std_slice @std_slice_23 : i32, i3
+    %std_slice_22.in, %std_slice_22.out = calyx.std_slice @std_slice_22 : i32, i16
+    %std_slice_21.in, %std_slice_21.out = calyx.std_slice @std_slice_21 : i32, i14
+    %std_slice_20.in, %std_slice_20.out = calyx.std_slice @std_slice_20 : i32, i10
+    %std_slice_19.in, %std_slice_19.out = calyx.std_slice @std_slice_19 : i32, i16
+    %std_slice_18.in, %std_slice_18.out = calyx.std_slice @std_slice_18 : i32, i16
+    %std_slice_17.in, %std_slice_17.out = calyx.std_slice @std_slice_17 : i32, i16
+    %std_slice_16.in, %std_slice_16.out = calyx.std_slice @std_slice_16 : i32, i16
+    %std_slice_15.in, %std_slice_15.out = calyx.std_slice @std_slice_15 : i32, i13
+    %std_slice_14.in, %std_slice_14.out = calyx.std_slice @std_slice_14 : i32, i16
+    %std_slice_13.in, %std_slice_13.out = calyx.std_slice @std_slice_13 : i32, i13
+    %std_slice_12.in, %std_slice_12.out = calyx.std_slice @std_slice_12 : i32, i13
+    %std_slice_11.in, %std_slice_11.out = calyx.std_slice @std_slice_11 : i32, i14
+    %std_slice_10.in, %std_slice_10.out = calyx.std_slice @std_slice_10 : i32, i14
+    %std_slice_9.in, %std_slice_9.out = calyx.std_slice @std_slice_9 : i32, i1
+    %std_slice_8.in, %std_slice_8.out = calyx.std_slice @std_slice_8 : i32, i13
+    %std_slice_7.in, %std_slice_7.out = calyx.std_slice @std_slice_7 : i32, i14
+    %std_slice_6.in, %std_slice_6.out = calyx.std_slice @std_slice_6 : i32, i1
+    %std_slice_5.in, %std_slice_5.out = calyx.std_slice @std_slice_5 : i32, i1
+    %std_slice_4.in, %std_slice_4.out = calyx.std_slice @std_slice_4 : i32, i1
+    %std_slice_3.in, %std_slice_3.out = calyx.std_slice @std_slice_3 : i32, i1
+    %std_slice_2.in, %std_slice_2.out = calyx.std_slice @std_slice_2 : i32, i1
+    %std_slice_1.in, %std_slice_1.out = calyx.std_slice @std_slice_1 : i32, i1
+    %std_slice_0.in, %std_slice_0.out = calyx.std_slice @std_slice_0 : i32, i1
+    %load_8_reg.in, %load_8_reg.write_en, %load_8_reg.clk, %load_8_reg.reset, %load_8_reg.out, %load_8_reg.done = calyx.register @load_8_reg : i32, i1, i1, i1, i32, i1
+    %std_add_71.left, %std_add_71.right, %std_add_71.out = calyx.std_add @std_add_71 : i32, i32, i32
+    %std_slt_29.left, %std_slt_29.right, %std_slt_29.out = calyx.std_slt @std_slt_29 : i32, i32, i1
+    %addf_2_reg.in, %addf_2_reg.write_en, %addf_2_reg.clk, %addf_2_reg.reset, %addf_2_reg.out, %addf_2_reg.done = calyx.register @addf_2_reg : i32, i1, i1, i1, i32, i1
+    %std_addFN_2.clk, %std_addFN_2.reset, %std_addFN_2.go, %std_addFN_2.control, %std_addFN_2.subOp, %std_addFN_2.left, %std_addFN_2.right, %std_addFN_2.roundingMode, %std_addFN_2.out, %std_addFN_2.exceptionalFlags, %std_addFN_2.done = calyx.ieee754.add @std_addFN_2 : i1, i1, i1, i1, i1, i32, i32, i3, i32, i5, i1
+    %load_7_reg.in, %load_7_reg.write_en, %load_7_reg.clk, %load_7_reg.reset, %load_7_reg.out, %load_7_reg.done = calyx.register @load_7_reg : i32, i1, i1, i1, i32, i1
+    %std_add_70.left, %std_add_70.right, %std_add_70.out = calyx.std_add @std_add_70 : i32, i32, i32
+    %std_slt_28.left, %std_slt_28.right, %std_slt_28.out = calyx.std_slt @std_slt_28 : i32, i32, i1
+    %addf_1_reg.in, %addf_1_reg.write_en, %addf_1_reg.clk, %addf_1_reg.reset, %addf_1_reg.out, %addf_1_reg.done = calyx.register @addf_1_reg : i32, i1, i1, i1, i32, i1
+    %std_addFN_1.clk, %std_addFN_1.reset, %std_addFN_1.go, %std_addFN_1.control, %std_addFN_1.subOp, %std_addFN_1.left, %std_addFN_1.right, %std_addFN_1.roundingMode, %std_addFN_1.out, %std_addFN_1.exceptionalFlags, %std_addFN_1.done = calyx.ieee754.add @std_addFN_1 : i1, i1, i1, i1, i1, i32, i32, i3, i32, i5, i1
+    %mulf_1_reg.in, %mulf_1_reg.write_en, %mulf_1_reg.clk, %mulf_1_reg.reset, %mulf_1_reg.out, %mulf_1_reg.done = calyx.register @mulf_1_reg : i32, i1, i1, i1, i32, i1
+    %std_mulFN_1.clk, %std_mulFN_1.reset, %std_mulFN_1.go, %std_mulFN_1.control, %std_mulFN_1.left, %std_mulFN_1.right, %std_mulFN_1.roundingMode, %std_mulFN_1.out, %std_mulFN_1.exceptionalFlags, %std_mulFN_1.done = calyx.ieee754.mul @std_mulFN_1 : i1, i1, i1, i1, i32, i32, i3, i32, i5, i1
+    %load_6_reg.in, %load_6_reg.write_en, %load_6_reg.clk, %load_6_reg.reset, %load_6_reg.out, %load_6_reg.done = calyx.register @load_6_reg : i32, i1, i1, i1, i32, i1
+    %load_5_reg.in, %load_5_reg.write_en, %load_5_reg.clk, %load_5_reg.reset, %load_5_reg.out, %load_5_reg.done = calyx.register @load_5_reg : i32, i1, i1, i1, i32, i1
+    %std_add_69.left, %std_add_69.right, %std_add_69.out = calyx.std_add @std_add_69 : i32, i32, i32
+    %std_lsh_1.left, %std_lsh_1.right, %std_lsh_1.out = calyx.std_lsh @std_lsh_1 : i32, i32, i32
+    %load_4_reg.in, %load_4_reg.write_en, %load_4_reg.clk, %load_4_reg.reset, %load_4_reg.out, %load_4_reg.done = calyx.register @load_4_reg : i32, i1, i1, i1, i32, i1
+    %std_add_68.left, %std_add_68.right, %std_add_68.out = calyx.std_add @std_add_68 : i32, i32, i32
+    %muli_6_reg.in, %muli_6_reg.write_en, %muli_6_reg.clk, %muli_6_reg.reset, %muli_6_reg.out, %muli_6_reg.done = calyx.register @muli_6_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_6.clk, %std_mult_pipe_6.reset, %std_mult_pipe_6.go, %std_mult_pipe_6.left, %std_mult_pipe_6.right, %std_mult_pipe_6.out, %std_mult_pipe_6.done = calyx.std_mult_pipe @std_mult_pipe_6 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_67.left, %std_add_67.right, %std_add_67.out = calyx.std_add @std_add_67 : i32, i32, i32
+    %muli_5_reg.in, %muli_5_reg.write_en, %muli_5_reg.clk, %muli_5_reg.reset, %muli_5_reg.out, %muli_5_reg.done = calyx.register @muli_5_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_5.clk, %std_mult_pipe_5.reset, %std_mult_pipe_5.go, %std_mult_pipe_5.left, %std_mult_pipe_5.right, %std_mult_pipe_5.out, %std_mult_pipe_5.done = calyx.std_mult_pipe @std_mult_pipe_5 : i1, i1, i1, i32, i32, i32, i1
+    %std_mux_5.cond, %std_mux_5.tru, %std_mux_5.fal, %std_mux_5.out = calyx.std_mux @std_mux_5 : i1, i32, i32, i32
+    %std_add_66.left, %std_add_66.right, %std_add_66.out = calyx.std_add @std_add_66 : i32, i32, i32
+    %std_slt_27.left, %std_slt_27.right, %std_slt_27.out = calyx.std_slt @std_slt_27 : i32, i32, i1
+    %remsi_1_reg.in, %remsi_1_reg.write_en, %remsi_1_reg.clk, %remsi_1_reg.reset, %remsi_1_reg.out, %remsi_1_reg.done = calyx.register @remsi_1_reg : i32, i1, i1, i1, i32, i1
+    %std_rems_pipe_1.clk, %std_rems_pipe_1.reset, %std_rems_pipe_1.go, %std_rems_pipe_1.left, %std_rems_pipe_1.right, %std_rems_pipe_1.out_remainder, %std_rems_pipe_1.done = calyx.std_rems_pipe @std_rems_pipe_1 : i1, i1, i1, i32, i32, i32, i1
+    %divsi_1_reg.in, %divsi_1_reg.write_en, %divsi_1_reg.clk, %divsi_1_reg.reset, %divsi_1_reg.out, %divsi_1_reg.done = calyx.register @divsi_1_reg : i32, i1, i1, i1, i32, i1
+    %std_divs_pipe_1.clk, %std_divs_pipe_1.reset, %std_divs_pipe_1.go, %std_divs_pipe_1.left, %std_divs_pipe_1.right, %std_divs_pipe_1.out_quotient, %std_divs_pipe_1.done = calyx.std_divs_pipe @std_divs_pipe_1 : i1, i1, i1, i32, i32, i32, i1
+    %std_mux_4.cond, %std_mux_4.tru, %std_mux_4.fal, %std_mux_4.out = calyx.std_mux @std_mux_4 : i1, i32, i32, i32
+    %std_add_65.left, %std_add_65.right, %std_add_65.out = calyx.std_add @std_add_65 : i32, i32, i32
+    %std_slt_26.left, %std_slt_26.right, %std_slt_26.out = calyx.std_slt @std_slt_26 : i32, i32, i1
+    %remsi_0_reg.in, %remsi_0_reg.write_en, %remsi_0_reg.clk, %remsi_0_reg.reset, %remsi_0_reg.out, %remsi_0_reg.done = calyx.register @remsi_0_reg : i32, i1, i1, i1, i32, i1
+    %std_rems_pipe_0.clk, %std_rems_pipe_0.reset, %std_rems_pipe_0.go, %std_rems_pipe_0.left, %std_rems_pipe_0.right, %std_rems_pipe_0.out_remainder, %std_rems_pipe_0.done = calyx.std_rems_pipe @std_rems_pipe_0 : i1, i1, i1, i32, i32, i32, i1
+    %std_mux_3.cond, %std_mux_3.tru, %std_mux_3.fal, %std_mux_3.out = calyx.std_mux @std_mux_3 : i1, i32, i32, i32
+    %std_add_64.left, %std_add_64.right, %std_add_64.out = calyx.std_add @std_add_64 : i32, i32, i32
+    %std_and_2.left, %std_and_2.right, %std_and_2.out = calyx.std_and @std_and_2 : i1, i1, i1
+    %std_slt_25.left, %std_slt_25.right, %std_slt_25.out = calyx.std_slt @std_slt_25 : i32, i32, i1
+    %std_neq_0.left, %std_neq_0.right, %std_neq_0.out = calyx.std_neq @std_neq_0 : i32, i32, i1
+    %muli_4_reg.in, %muli_4_reg.write_en, %muli_4_reg.clk, %muli_4_reg.reset, %muli_4_reg.out, %muli_4_reg.done = calyx.register @muli_4_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_4.clk, %std_mult_pipe_4.reset, %std_mult_pipe_4.go, %std_mult_pipe_4.left, %std_mult_pipe_4.right, %std_mult_pipe_4.out, %std_mult_pipe_4.done = calyx.std_mult_pipe @std_mult_pipe_4 : i1, i1, i1, i32, i32, i32, i1
+    %divsi_0_reg.in, %divsi_0_reg.write_en, %divsi_0_reg.clk, %divsi_0_reg.reset, %divsi_0_reg.out, %divsi_0_reg.done = calyx.register @divsi_0_reg : i32, i1, i1, i1, i32, i1
+    %std_divs_pipe_0.clk, %std_divs_pipe_0.reset, %std_divs_pipe_0.go, %std_divs_pipe_0.left, %std_divs_pipe_0.right, %std_divs_pipe_0.out_quotient, %std_divs_pipe_0.done = calyx.std_divs_pipe @std_divs_pipe_0 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_63.left, %std_add_63.right, %std_add_63.out = calyx.std_add @std_add_63 : i32, i32, i32
+    %std_slt_24.left, %std_slt_24.right, %std_slt_24.out = calyx.std_slt @std_slt_24 : i32, i32, i1
+    %std_add_62.left, %std_add_62.right, %std_add_62.out = calyx.std_add @std_add_62 : i32, i32, i32
+    %std_slt_23.left, %std_slt_23.right, %std_slt_23.out = calyx.std_slt @std_slt_23 : i32, i32, i1
+    %std_add_61.left, %std_add_61.right, %std_add_61.out = calyx.std_add @std_add_61 : i32, i32, i32
+    %std_slt_22.left, %std_slt_22.right, %std_slt_22.out = calyx.std_slt @std_slt_22 : i32, i32, i1
+    %std_add_60.left, %std_add_60.right, %std_add_60.out = calyx.std_add @std_add_60 : i32, i32, i32
+    %std_add_59.left, %std_add_59.right, %std_add_59.out = calyx.std_add @std_add_59 : i32, i32, i32
+    %std_add_58.left, %std_add_58.right, %std_add_58.out = calyx.std_add @std_add_58 : i32, i32, i32
+    %std_add_57.left, %std_add_57.right, %std_add_57.out = calyx.std_add @std_add_57 : i32, i32, i32
+    %std_slt_21.left, %std_slt_21.right, %std_slt_21.out = calyx.std_slt @std_slt_21 : i32, i32, i1
+    %std_lsh_0.left, %std_lsh_0.right, %std_lsh_0.out = calyx.std_lsh @std_lsh_0 : i32, i32, i32
+    %std_add_56.left, %std_add_56.right, %std_add_56.out = calyx.std_add @std_add_56 : i32, i32, i32
+    %std_slt_20.left, %std_slt_20.right, %std_slt_20.out = calyx.std_slt @std_slt_20 : i32, i32, i1
+    %std_add_55.left, %std_add_55.right, %std_add_55.out = calyx.std_add @std_add_55 : i32, i32, i32
+    %std_add_54.left, %std_add_54.right, %std_add_54.out = calyx.std_add @std_add_54 : i32, i32, i32
+    %std_add_53.left, %std_add_53.right, %std_add_53.out = calyx.std_add @std_add_53 : i32, i32, i32
+    %std_add_52.left, %std_add_52.right, %std_add_52.out = calyx.std_add @std_add_52 : i32, i32, i32
+    %std_add_51.left, %std_add_51.right, %std_add_51.out = calyx.std_add @std_add_51 : i32, i32, i32
+    %std_add_50.left, %std_add_50.right, %std_add_50.out = calyx.std_add @std_add_50 : i32, i32, i32
+    %std_add_49.left, %std_add_49.right, %std_add_49.out = calyx.std_add @std_add_49 : i32, i32, i32
+    %std_mux_2.cond, %std_mux_2.tru, %std_mux_2.fal, %std_mux_2.out = calyx.std_mux @std_mux_2 : i1, i32, i32, i32
+    %unordered_port_2_reg.in, %unordered_port_2_reg.write_en, %unordered_port_2_reg.clk, %unordered_port_2_reg.reset, %unordered_port_2_reg.out, %unordered_port_2_reg.done = calyx.register @unordered_port_2_reg : i1, i1, i1, i1, i1, i1
+    %cmpf_2_reg.in, %cmpf_2_reg.write_en, %cmpf_2_reg.clk, %cmpf_2_reg.reset, %cmpf_2_reg.out, %cmpf_2_reg.done = calyx.register @cmpf_2_reg : i1, i1, i1, i1, i1, i1
+    %std_compareFN_2.clk, %std_compareFN_2.reset, %std_compareFN_2.go, %std_compareFN_2.left, %std_compareFN_2.right, %std_compareFN_2.signaling, %std_compareFN_2.lt, %std_compareFN_2.eq, %std_compareFN_2.gt, %std_compareFN_2.unordered, %std_compareFN_2.exceptionalFlags, %std_compareFN_2.done = calyx.ieee754.compare @std_compareFN_2 : i1, i1, i1, i32, i32, i1, i1, i1, i1, i1, i5, i1
+    %std_mux_1.cond, %std_mux_1.tru, %std_mux_1.fal, %std_mux_1.out = calyx.std_mux @std_mux_1 : i1, i32, i32, i32
+    %std_and_1.left, %std_and_1.right, %std_and_1.out = calyx.std_and @std_and_1 : i1, i1, i1
+    %std_or_1.left, %std_or_1.right, %std_or_1.out = calyx.std_or @std_or_1 : i1, i1, i1
+    %unordered_port_1_reg.in, %unordered_port_1_reg.write_en, %unordered_port_1_reg.clk, %unordered_port_1_reg.reset, %unordered_port_1_reg.out, %unordered_port_1_reg.done = calyx.register @unordered_port_1_reg : i1, i1, i1, i1, i1, i1
+    %compare_port_1_reg.in, %compare_port_1_reg.write_en, %compare_port_1_reg.clk, %compare_port_1_reg.reset, %compare_port_1_reg.out, %compare_port_1_reg.done = calyx.register @compare_port_1_reg : i1, i1, i1, i1, i1, i1
+    %cmpf_1_reg.in, %cmpf_1_reg.write_en, %cmpf_1_reg.clk, %cmpf_1_reg.reset, %cmpf_1_reg.out, %cmpf_1_reg.done = calyx.register @cmpf_1_reg : i1, i1, i1, i1, i1, i1
+    %std_compareFN_1.clk, %std_compareFN_1.reset, %std_compareFN_1.go, %std_compareFN_1.left, %std_compareFN_1.right, %std_compareFN_1.signaling, %std_compareFN_1.lt, %std_compareFN_1.eq, %std_compareFN_1.gt, %std_compareFN_1.unordered, %std_compareFN_1.exceptionalFlags, %std_compareFN_1.done = calyx.ieee754.compare @std_compareFN_1 : i1, i1, i1, i32, i32, i1, i1, i1, i1, i1, i5, i1
+    %load_3_reg.in, %load_3_reg.write_en, %load_3_reg.clk, %load_3_reg.reset, %load_3_reg.out, %load_3_reg.done = calyx.register @load_3_reg : i32, i1, i1, i1, i32, i1
+    %load_2_reg.in, %load_2_reg.write_en, %load_2_reg.clk, %load_2_reg.reset, %load_2_reg.out, %load_2_reg.done = calyx.register @load_2_reg : i32, i1, i1, i1, i32, i1
+    %std_add_48.left, %std_add_48.right, %std_add_48.out = calyx.std_add @std_add_48 : i32, i32, i32
+    %std_add_47.left, %std_add_47.right, %std_add_47.out = calyx.std_add @std_add_47 : i32, i32, i32
+    %std_add_46.left, %std_add_46.right, %std_add_46.out = calyx.std_add @std_add_46 : i32, i32, i32
+    %std_slt_19.left, %std_slt_19.right, %std_slt_19.out = calyx.std_slt @std_slt_19 : i32, i32, i1
+    %std_add_45.left, %std_add_45.right, %std_add_45.out = calyx.std_add @std_add_45 : i32, i32, i32
+    %std_slt_18.left, %std_slt_18.right, %std_slt_18.out = calyx.std_slt @std_slt_18 : i32, i32, i1
+    %std_add_44.left, %std_add_44.right, %std_add_44.out = calyx.std_add @std_add_44 : i32, i32, i32
+    %std_add_43.left, %std_add_43.right, %std_add_43.out = calyx.std_add @std_add_43 : i32, i32, i32
+    %std_slt_17.left, %std_slt_17.right, %std_slt_17.out = calyx.std_slt @std_slt_17 : i32, i32, i1
+    %muli_3_reg.in, %muli_3_reg.write_en, %muli_3_reg.clk, %muli_3_reg.reset, %muli_3_reg.out, %muli_3_reg.done = calyx.register @muli_3_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_3.clk, %std_mult_pipe_3.reset, %std_mult_pipe_3.go, %std_mult_pipe_3.left, %std_mult_pipe_3.right, %std_mult_pipe_3.out, %std_mult_pipe_3.done = calyx.std_mult_pipe @std_mult_pipe_3 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_42.left, %std_add_42.right, %std_add_42.out = calyx.std_add @std_add_42 : i32, i32, i32
+    %std_add_41.left, %std_add_41.right, %std_add_41.out = calyx.std_add @std_add_41 : i32, i32, i32
+    %std_slt_16.left, %std_slt_16.right, %std_slt_16.out = calyx.std_slt @std_slt_16 : i32, i32, i1
+    %std_add_40.left, %std_add_40.right, %std_add_40.out = calyx.std_add @std_add_40 : i32, i32, i32
+    %std_slt_15.left, %std_slt_15.right, %std_slt_15.out = calyx.std_slt @std_slt_15 : i32, i32, i1
+    %std_add_39.left, %std_add_39.right, %std_add_39.out = calyx.std_add @std_add_39 : i32, i32, i32
+    %std_add_38.left, %std_add_38.right, %std_add_38.out = calyx.std_add @std_add_38 : i32, i32, i32
+    %std_add_37.left, %std_add_37.right, %std_add_37.out = calyx.std_add @std_add_37 : i32, i32, i32
+    %std_add_36.left, %std_add_36.right, %std_add_36.out = calyx.std_add @std_add_36 : i32, i32, i32
+    %std_add_35.left, %std_add_35.right, %std_add_35.out = calyx.std_add @std_add_35 : i32, i32, i32
+    %std_slt_14.left, %std_slt_14.right, %std_slt_14.out = calyx.std_slt @std_slt_14 : i32, i32, i1
+    %std_add_34.left, %std_add_34.right, %std_add_34.out = calyx.std_add @std_add_34 : i32, i32, i32
+    %std_slt_13.left, %std_slt_13.right, %std_slt_13.out = calyx.std_slt @std_slt_13 : i32, i32, i1
+    %std_add_33.left, %std_add_33.right, %std_add_33.out = calyx.std_add @std_add_33 : i32, i32, i32
+    %std_slt_12.left, %std_slt_12.right, %std_slt_12.out = calyx.std_slt @std_slt_12 : i32, i32, i1
+    %std_add_32.left, %std_add_32.right, %std_add_32.out = calyx.std_add @std_add_32 : i32, i32, i32
+    %std_add_31.left, %std_add_31.right, %std_add_31.out = calyx.std_add @std_add_31 : i32, i32, i32
+    %std_add_30.left, %std_add_30.right, %std_add_30.out = calyx.std_add @std_add_30 : i32, i32, i32
+    %std_mux_0.cond, %std_mux_0.tru, %std_mux_0.fal, %std_mux_0.out = calyx.std_mux @std_mux_0 : i1, i32, i32, i32
+    %std_and_0.left, %std_and_0.right, %std_and_0.out = calyx.std_and @std_and_0 : i1, i1, i1
+    %std_or_0.left, %std_or_0.right, %std_or_0.out = calyx.std_or @std_or_0 : i1, i1, i1
+    %unordered_port_0_reg.in, %unordered_port_0_reg.write_en, %unordered_port_0_reg.clk, %unordered_port_0_reg.reset, %unordered_port_0_reg.out, %unordered_port_0_reg.done = calyx.register @unordered_port_0_reg : i1, i1, i1, i1, i1, i1
+    %compare_port_0_reg.in, %compare_port_0_reg.write_en, %compare_port_0_reg.clk, %compare_port_0_reg.reset, %compare_port_0_reg.out, %compare_port_0_reg.done = calyx.register @compare_port_0_reg : i1, i1, i1, i1, i1, i1
+    %cmpf_0_reg.in, %cmpf_0_reg.write_en, %cmpf_0_reg.clk, %cmpf_0_reg.reset, %cmpf_0_reg.out, %cmpf_0_reg.done = calyx.register @cmpf_0_reg : i1, i1, i1, i1, i1, i1
+    %std_compareFN_0.clk, %std_compareFN_0.reset, %std_compareFN_0.go, %std_compareFN_0.left, %std_compareFN_0.right, %std_compareFN_0.signaling, %std_compareFN_0.lt, %std_compareFN_0.eq, %std_compareFN_0.gt, %std_compareFN_0.unordered, %std_compareFN_0.exceptionalFlags, %std_compareFN_0.done = calyx.ieee754.compare @std_compareFN_0 : i1, i1, i1, i32, i32, i1, i1, i1, i1, i1, i5, i1
+    %load_1_reg.in, %load_1_reg.write_en, %load_1_reg.clk, %load_1_reg.reset, %load_1_reg.out, %load_1_reg.done = calyx.register @load_1_reg : i32, i1, i1, i1, i32, i1
+    %std_add_29.left, %std_add_29.right, %std_add_29.out = calyx.std_add @std_add_29 : i32, i32, i32
+    %std_add_28.left, %std_add_28.right, %std_add_28.out = calyx.std_add @std_add_28 : i32, i32, i32
+    %std_slt_11.left, %std_slt_11.right, %std_slt_11.out = calyx.std_slt @std_slt_11 : i32, i32, i1
+    %std_add_27.left, %std_add_27.right, %std_add_27.out = calyx.std_add @std_add_27 : i32, i32, i32
+    %std_slt_10.left, %std_slt_10.right, %std_slt_10.out = calyx.std_slt @std_slt_10 : i32, i32, i1
+    %std_add_26.left, %std_add_26.right, %std_add_26.out = calyx.std_add @std_add_26 : i32, i32, i32
+    %std_slt_9.left, %std_slt_9.right, %std_slt_9.out = calyx.std_slt @std_slt_9 : i32, i32, i1
+    %std_add_25.left, %std_add_25.right, %std_add_25.out = calyx.std_add @std_add_25 : i32, i32, i32
+    %std_add_24.left, %std_add_24.right, %std_add_24.out = calyx.std_add @std_add_24 : i32, i32, i32
+    %std_add_23.left, %std_add_23.right, %std_add_23.out = calyx.std_add @std_add_23 : i32, i32, i32
+    %std_add_22.left, %std_add_22.right, %std_add_22.out = calyx.std_add @std_add_22 : i32, i32, i32
+    %std_add_21.left, %std_add_21.right, %std_add_21.out = calyx.std_add @std_add_21 : i32, i32, i32
+    %std_add_20.left, %std_add_20.right, %std_add_20.out = calyx.std_add @std_add_20 : i32, i32, i32
+    %std_add_19.left, %std_add_19.right, %std_add_19.out = calyx.std_add @std_add_19 : i32, i32, i32
+    %std_add_18.left, %std_add_18.right, %std_add_18.out = calyx.std_add @std_add_18 : i32, i32, i32
+    %std_add_17.left, %std_add_17.right, %std_add_17.out = calyx.std_add @std_add_17 : i32, i32, i32
+    %addf_0_reg.in, %addf_0_reg.write_en, %addf_0_reg.clk, %addf_0_reg.reset, %addf_0_reg.out, %addf_0_reg.done = calyx.register @addf_0_reg : i32, i1, i1, i1, i32, i1
+    %std_addFN_0.clk, %std_addFN_0.reset, %std_addFN_0.go, %std_addFN_0.control, %std_addFN_0.subOp, %std_addFN_0.left, %std_addFN_0.right, %std_addFN_0.roundingMode, %std_addFN_0.out, %std_addFN_0.exceptionalFlags, %std_addFN_0.done = calyx.ieee754.add @std_addFN_0 : i1, i1, i1, i1, i1, i32, i32, i3, i32, i5, i1
+    %mulf_0_reg.in, %mulf_0_reg.write_en, %mulf_0_reg.clk, %mulf_0_reg.reset, %mulf_0_reg.out, %mulf_0_reg.done = calyx.register @mulf_0_reg : i32, i1, i1, i1, i32, i1
+    %std_mulFN_0.clk, %std_mulFN_0.reset, %std_mulFN_0.go, %std_mulFN_0.control, %std_mulFN_0.left, %std_mulFN_0.right, %std_mulFN_0.roundingMode, %std_mulFN_0.out, %std_mulFN_0.exceptionalFlags, %std_mulFN_0.done = calyx.ieee754.mul @std_mulFN_0 : i1, i1, i1, i1, i32, i32, i3, i32, i5, i1
+    %load_0_reg.in, %load_0_reg.write_en, %load_0_reg.clk, %load_0_reg.reset, %load_0_reg.out, %load_0_reg.done = calyx.register @load_0_reg : i32, i1, i1, i1, i32, i1
+    %std_add_16.left, %std_add_16.right, %std_add_16.out = calyx.std_add @std_add_16 : i32, i32, i32
+    %std_add_15.left, %std_add_15.right, %std_add_15.out = calyx.std_add @std_add_15 : i32, i32, i32
+    %std_add_14.left, %std_add_14.right, %std_add_14.out = calyx.std_add @std_add_14 : i32, i32, i32
+    %std_add_13.left, %std_add_13.right, %std_add_13.out = calyx.std_add @std_add_13 : i32, i32, i32
+    %std_slt_8.left, %std_slt_8.right, %std_slt_8.out = calyx.std_slt @std_slt_8 : i32, i32, i1
+    %std_add_12.left, %std_add_12.right, %std_add_12.out = calyx.std_add @std_add_12 : i32, i32, i32
+    %std_slt_7.left, %std_slt_7.right, %std_slt_7.out = calyx.std_slt @std_slt_7 : i32, i32, i1
+    %muli_2_reg.in, %muli_2_reg.write_en, %muli_2_reg.clk, %muli_2_reg.reset, %muli_2_reg.out, %muli_2_reg.done = calyx.register @muli_2_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_2.clk, %std_mult_pipe_2.reset, %std_mult_pipe_2.go, %std_mult_pipe_2.left, %std_mult_pipe_2.right, %std_mult_pipe_2.out, %std_mult_pipe_2.done = calyx.std_mult_pipe @std_mult_pipe_2 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_11.left, %std_add_11.right, %std_add_11.out = calyx.std_add @std_add_11 : i32, i32, i32
+    %std_slt_6.left, %std_slt_6.right, %std_slt_6.out = calyx.std_slt @std_slt_6 : i32, i32, i1
+    %std_add_10.left, %std_add_10.right, %std_add_10.out = calyx.std_add @std_add_10 : i32, i32, i32
+    %std_add_9.left, %std_add_9.right, %std_add_9.out = calyx.std_add @std_add_9 : i32, i32, i32
+    %std_slt_5.left, %std_slt_5.right, %std_slt_5.out = calyx.std_slt @std_slt_5 : i32, i32, i1
+    %muli_1_reg.in, %muli_1_reg.write_en, %muli_1_reg.clk, %muli_1_reg.reset, %muli_1_reg.out, %muli_1_reg.done = calyx.register @muli_1_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_1.clk, %std_mult_pipe_1.reset, %std_mult_pipe_1.go, %std_mult_pipe_1.left, %std_mult_pipe_1.right, %std_mult_pipe_1.out, %std_mult_pipe_1.done = calyx.std_mult_pipe @std_mult_pipe_1 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_8.left, %std_add_8.right, %std_add_8.out = calyx.std_add @std_add_8 : i32, i32, i32
+    %std_slt_4.left, %std_slt_4.right, %std_slt_4.out = calyx.std_slt @std_slt_4 : i32, i32, i1
+    %muli_0_reg.in, %muli_0_reg.write_en, %muli_0_reg.clk, %muli_0_reg.reset, %muli_0_reg.out, %muli_0_reg.done = calyx.register @muli_0_reg : i32, i1, i1, i1, i32, i1
+    %std_mult_pipe_0.clk, %std_mult_pipe_0.reset, %std_mult_pipe_0.go, %std_mult_pipe_0.left, %std_mult_pipe_0.right, %std_mult_pipe_0.out, %std_mult_pipe_0.done = calyx.std_mult_pipe @std_mult_pipe_0 : i1, i1, i1, i32, i32, i32, i1
+    %std_add_7.left, %std_add_7.right, %std_add_7.out = calyx.std_add @std_add_7 : i32, i32, i32
+    %std_slt_3.left, %std_slt_3.right, %std_slt_3.out = calyx.std_slt @std_slt_3 : i32, i32, i1
+    %std_add_6.left, %std_add_6.right, %std_add_6.out = calyx.std_add @std_add_6 : i32, i32, i32
+    %std_add_5.left, %std_add_5.right, %std_add_5.out = calyx.std_add @std_add_5 : i32, i32, i32
+    %std_add_4.left, %std_add_4.right, %std_add_4.out = calyx.std_add @std_add_4 : i32, i32, i32
+    %std_add_3.left, %std_add_3.right, %std_add_3.out = calyx.std_add @std_add_3 : i32, i32, i32
+    %std_add_2.left, %std_add_2.right, %std_add_2.out = calyx.std_add @std_add_2 : i32, i32, i32
+    %std_slt_2.left, %std_slt_2.right, %std_slt_2.out = calyx.std_slt @std_slt_2 : i32, i32, i1
+    %std_add_1.left, %std_add_1.right, %std_add_1.out = calyx.std_add @std_add_1 : i32, i32, i32
+    %std_slt_1.left, %std_slt_1.right, %std_slt_1.out = calyx.std_slt @std_slt_1 : i32, i32, i1
+    %std_add_0.left, %std_add_0.right, %std_add_0.out = calyx.std_add @std_add_0 : i32, i32, i32
+    %std_slt_0.left, %std_slt_0.right, %std_slt_0.out = calyx.std_slt @std_slt_0 : i32, i32, i1
+    %while_26_arg0_reg.in, %while_26_arg0_reg.write_en, %while_26_arg0_reg.clk, %while_26_arg0_reg.reset, %while_26_arg0_reg.out, %while_26_arg0_reg.done = calyx.register @while_26_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_25_arg0_reg.in, %while_25_arg0_reg.write_en, %while_25_arg0_reg.clk, %while_25_arg0_reg.reset, %while_25_arg0_reg.out, %while_25_arg0_reg.done = calyx.register @while_25_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_24_arg0_reg.in, %while_24_arg0_reg.write_en, %while_24_arg0_reg.clk, %while_24_arg0_reg.reset, %while_24_arg0_reg.out, %while_24_arg0_reg.done = calyx.register @while_24_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_23_arg0_reg.in, %while_23_arg0_reg.write_en, %while_23_arg0_reg.clk, %while_23_arg0_reg.reset, %while_23_arg0_reg.out, %while_23_arg0_reg.done = calyx.register @while_23_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_22_arg0_reg.in, %while_22_arg0_reg.write_en, %while_22_arg0_reg.clk, %while_22_arg0_reg.reset, %while_22_arg0_reg.out, %while_22_arg0_reg.done = calyx.register @while_22_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_21_arg0_reg.in, %while_21_arg0_reg.write_en, %while_21_arg0_reg.clk, %while_21_arg0_reg.reset, %while_21_arg0_reg.out, %while_21_arg0_reg.done = calyx.register @while_21_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_20_arg1_reg.in, %while_20_arg1_reg.write_en, %while_20_arg1_reg.clk, %while_20_arg1_reg.reset, %while_20_arg1_reg.out, %while_20_arg1_reg.done = calyx.register @while_20_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_20_arg0_reg.in, %while_20_arg0_reg.write_en, %while_20_arg0_reg.clk, %while_20_arg0_reg.reset, %while_20_arg0_reg.out, %while_20_arg0_reg.done = calyx.register @while_20_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_19_arg3_reg.in, %while_19_arg3_reg.write_en, %while_19_arg3_reg.clk, %while_19_arg3_reg.reset, %while_19_arg3_reg.out, %while_19_arg3_reg.done = calyx.register @while_19_arg3_reg : i32, i1, i1, i1, i32, i1
+    %while_19_arg2_reg.in, %while_19_arg2_reg.write_en, %while_19_arg2_reg.clk, %while_19_arg2_reg.reset, %while_19_arg2_reg.out, %while_19_arg2_reg.done = calyx.register @while_19_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_19_arg1_reg.in, %while_19_arg1_reg.write_en, %while_19_arg1_reg.clk, %while_19_arg1_reg.reset, %while_19_arg1_reg.out, %while_19_arg1_reg.done = calyx.register @while_19_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_19_arg0_reg.in, %while_19_arg0_reg.write_en, %while_19_arg0_reg.clk, %while_19_arg0_reg.reset, %while_19_arg0_reg.out, %while_19_arg0_reg.done = calyx.register @while_19_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_18_arg2_reg.in, %while_18_arg2_reg.write_en, %while_18_arg2_reg.clk, %while_18_arg2_reg.reset, %while_18_arg2_reg.out, %while_18_arg2_reg.done = calyx.register @while_18_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_18_arg1_reg.in, %while_18_arg1_reg.write_en, %while_18_arg1_reg.clk, %while_18_arg1_reg.reset, %while_18_arg1_reg.out, %while_18_arg1_reg.done = calyx.register @while_18_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_18_arg0_reg.in, %while_18_arg0_reg.write_en, %while_18_arg0_reg.clk, %while_18_arg0_reg.reset, %while_18_arg0_reg.out, %while_18_arg0_reg.done = calyx.register @while_18_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_17_arg1_reg.in, %while_17_arg1_reg.write_en, %while_17_arg1_reg.clk, %while_17_arg1_reg.reset, %while_17_arg1_reg.out, %while_17_arg1_reg.done = calyx.register @while_17_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_17_arg0_reg.in, %while_17_arg0_reg.write_en, %while_17_arg0_reg.clk, %while_17_arg0_reg.reset, %while_17_arg0_reg.out, %while_17_arg0_reg.done = calyx.register @while_17_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_16_arg1_reg.in, %while_16_arg1_reg.write_en, %while_16_arg1_reg.clk, %while_16_arg1_reg.reset, %while_16_arg1_reg.out, %while_16_arg1_reg.done = calyx.register @while_16_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_16_arg0_reg.in, %while_16_arg0_reg.write_en, %while_16_arg0_reg.clk, %while_16_arg0_reg.reset, %while_16_arg0_reg.out, %while_16_arg0_reg.done = calyx.register @while_16_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_15_arg0_reg.in, %while_15_arg0_reg.write_en, %while_15_arg0_reg.clk, %while_15_arg0_reg.reset, %while_15_arg0_reg.out, %while_15_arg0_reg.done = calyx.register @while_15_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_14_arg2_reg.in, %while_14_arg2_reg.write_en, %while_14_arg2_reg.clk, %while_14_arg2_reg.reset, %while_14_arg2_reg.out, %while_14_arg2_reg.done = calyx.register @while_14_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_14_arg1_reg.in, %while_14_arg1_reg.write_en, %while_14_arg1_reg.clk, %while_14_arg1_reg.reset, %while_14_arg1_reg.out, %while_14_arg1_reg.done = calyx.register @while_14_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_14_arg0_reg.in, %while_14_arg0_reg.write_en, %while_14_arg0_reg.clk, %while_14_arg0_reg.reset, %while_14_arg0_reg.out, %while_14_arg0_reg.done = calyx.register @while_14_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_13_arg1_reg.in, %while_13_arg1_reg.write_en, %while_13_arg1_reg.clk, %while_13_arg1_reg.reset, %while_13_arg1_reg.out, %while_13_arg1_reg.done = calyx.register @while_13_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_13_arg0_reg.in, %while_13_arg0_reg.write_en, %while_13_arg0_reg.clk, %while_13_arg0_reg.reset, %while_13_arg0_reg.out, %while_13_arg0_reg.done = calyx.register @while_13_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_12_arg0_reg.in, %while_12_arg0_reg.write_en, %while_12_arg0_reg.clk, %while_12_arg0_reg.reset, %while_12_arg0_reg.out, %while_12_arg0_reg.done = calyx.register @while_12_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_11_arg2_reg.in, %while_11_arg2_reg.write_en, %while_11_arg2_reg.clk, %while_11_arg2_reg.reset, %while_11_arg2_reg.out, %while_11_arg2_reg.done = calyx.register @while_11_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_11_arg1_reg.in, %while_11_arg1_reg.write_en, %while_11_arg1_reg.clk, %while_11_arg1_reg.reset, %while_11_arg1_reg.out, %while_11_arg1_reg.done = calyx.register @while_11_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_11_arg0_reg.in, %while_11_arg0_reg.write_en, %while_11_arg0_reg.clk, %while_11_arg0_reg.reset, %while_11_arg0_reg.out, %while_11_arg0_reg.done = calyx.register @while_11_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_10_arg1_reg.in, %while_10_arg1_reg.write_en, %while_10_arg1_reg.clk, %while_10_arg1_reg.reset, %while_10_arg1_reg.out, %while_10_arg1_reg.done = calyx.register @while_10_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_10_arg0_reg.in, %while_10_arg0_reg.write_en, %while_10_arg0_reg.clk, %while_10_arg0_reg.reset, %while_10_arg0_reg.out, %while_10_arg0_reg.done = calyx.register @while_10_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_9_arg0_reg.in, %while_9_arg0_reg.write_en, %while_9_arg0_reg.clk, %while_9_arg0_reg.reset, %while_9_arg0_reg.out, %while_9_arg0_reg.done = calyx.register @while_9_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_8_arg3_reg.in, %while_8_arg3_reg.write_en, %while_8_arg3_reg.clk, %while_8_arg3_reg.reset, %while_8_arg3_reg.out, %while_8_arg3_reg.done = calyx.register @while_8_arg3_reg : i32, i1, i1, i1, i32, i1
+    %while_8_arg2_reg.in, %while_8_arg2_reg.write_en, %while_8_arg2_reg.clk, %while_8_arg2_reg.reset, %while_8_arg2_reg.out, %while_8_arg2_reg.done = calyx.register @while_8_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_8_arg1_reg.in, %while_8_arg1_reg.write_en, %while_8_arg1_reg.clk, %while_8_arg1_reg.reset, %while_8_arg1_reg.out, %while_8_arg1_reg.done = calyx.register @while_8_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_8_arg0_reg.in, %while_8_arg0_reg.write_en, %while_8_arg0_reg.clk, %while_8_arg0_reg.reset, %while_8_arg0_reg.out, %while_8_arg0_reg.done = calyx.register @while_8_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_7_arg1_reg.in, %while_7_arg1_reg.write_en, %while_7_arg1_reg.clk, %while_7_arg1_reg.reset, %while_7_arg1_reg.out, %while_7_arg1_reg.done = calyx.register @while_7_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_7_arg0_reg.in, %while_7_arg0_reg.write_en, %while_7_arg0_reg.clk, %while_7_arg0_reg.reset, %while_7_arg0_reg.out, %while_7_arg0_reg.done = calyx.register @while_7_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_6_arg0_reg.in, %while_6_arg0_reg.write_en, %while_6_arg0_reg.clk, %while_6_arg0_reg.reset, %while_6_arg0_reg.out, %while_6_arg0_reg.done = calyx.register @while_6_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_5_arg3_reg.in, %while_5_arg3_reg.write_en, %while_5_arg3_reg.clk, %while_5_arg3_reg.reset, %while_5_arg3_reg.out, %while_5_arg3_reg.done = calyx.register @while_5_arg3_reg : i32, i1, i1, i1, i32, i1
+    %while_5_arg2_reg.in, %while_5_arg2_reg.write_en, %while_5_arg2_reg.clk, %while_5_arg2_reg.reset, %while_5_arg2_reg.out, %while_5_arg2_reg.done = calyx.register @while_5_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_5_arg1_reg.in, %while_5_arg1_reg.write_en, %while_5_arg1_reg.clk, %while_5_arg1_reg.reset, %while_5_arg1_reg.out, %while_5_arg1_reg.done = calyx.register @while_5_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_5_arg0_reg.in, %while_5_arg0_reg.write_en, %while_5_arg0_reg.clk, %while_5_arg0_reg.reset, %while_5_arg0_reg.out, %while_5_arg0_reg.done = calyx.register @while_5_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_4_arg2_reg.in, %while_4_arg2_reg.write_en, %while_4_arg2_reg.clk, %while_4_arg2_reg.reset, %while_4_arg2_reg.out, %while_4_arg2_reg.done = calyx.register @while_4_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_4_arg1_reg.in, %while_4_arg1_reg.write_en, %while_4_arg1_reg.clk, %while_4_arg1_reg.reset, %while_4_arg1_reg.out, %while_4_arg1_reg.done = calyx.register @while_4_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_4_arg0_reg.in, %while_4_arg0_reg.write_en, %while_4_arg0_reg.clk, %while_4_arg0_reg.reset, %while_4_arg0_reg.out, %while_4_arg0_reg.done = calyx.register @while_4_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_3_arg0_reg.in, %while_3_arg0_reg.write_en, %while_3_arg0_reg.clk, %while_3_arg0_reg.reset, %while_3_arg0_reg.out, %while_3_arg0_reg.done = calyx.register @while_3_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_2_arg2_reg.in, %while_2_arg2_reg.write_en, %while_2_arg2_reg.clk, %while_2_arg2_reg.reset, %while_2_arg2_reg.out, %while_2_arg2_reg.done = calyx.register @while_2_arg2_reg : i32, i1, i1, i1, i32, i1
+    %while_2_arg1_reg.in, %while_2_arg1_reg.write_en, %while_2_arg1_reg.clk, %while_2_arg1_reg.reset, %while_2_arg1_reg.out, %while_2_arg1_reg.done = calyx.register @while_2_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_2_arg0_reg.in, %while_2_arg0_reg.write_en, %while_2_arg0_reg.clk, %while_2_arg0_reg.reset, %while_2_arg0_reg.out, %while_2_arg0_reg.done = calyx.register @while_2_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_1_arg1_reg.in, %while_1_arg1_reg.write_en, %while_1_arg1_reg.clk, %while_1_arg1_reg.reset, %while_1_arg1_reg.out, %while_1_arg1_reg.done = calyx.register @while_1_arg1_reg : i32, i1, i1, i1, i32, i1
+    %while_1_arg0_reg.in, %while_1_arg0_reg.write_en, %while_1_arg0_reg.clk, %while_1_arg0_reg.reset, %while_1_arg0_reg.out, %while_1_arg0_reg.done = calyx.register @while_1_arg0_reg : i32, i1, i1, i1, i32, i1
+    %while_0_arg0_reg.in, %while_0_arg0_reg.write_en, %while_0_arg0_reg.clk, %while_0_arg0_reg.reset, %while_0_arg0_reg.out, %while_0_arg0_reg.done = calyx.register @while_0_arg0_reg : i32, i1, i1, i1, i32, i1
+    %arg_mem_9.addr0, %arg_mem_9.clk, %arg_mem_9.reset, %arg_mem_9.content_en, %arg_mem_9.write_en, %arg_mem_9.write_data, %arg_mem_9.read_data, %arg_mem_9.done = calyx.seq_mem @arg_mem_9 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_8.addr0, %arg_mem_8.clk, %arg_mem_8.reset, %arg_mem_8.content_en, %arg_mem_8.write_en, %arg_mem_8.write_data, %arg_mem_8.read_data, %arg_mem_8.done = calyx.seq_mem @arg_mem_8 <[10944] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_7.addr0, %arg_mem_7.clk, %arg_mem_7.reset, %arg_mem_7.content_en, %arg_mem_7.write_en, %arg_mem_7.write_data, %arg_mem_7.read_data, %arg_mem_7.done = calyx.seq_mem @arg_mem_7 <[5472] x 32> [13] : i13, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_6.addr0, %arg_mem_6.clk, %arg_mem_6.reset, %arg_mem_6.content_en, %arg_mem_6.write_en, %arg_mem_6.write_data, %arg_mem_6.read_data, %arg_mem_6.done = calyx.seq_mem @arg_mem_6 <[34048] x 32> [16] : i16, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_5.addr0, %arg_mem_5.clk, %arg_mem_5.reset, %arg_mem_5.content_en, %arg_mem_5.write_en, %arg_mem_5.write_data, %arg_mem_5.read_data, %arg_mem_5.done = calyx.seq_mem @arg_mem_5 <[8] x 32> [3] : i3, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_4.addr0, %arg_mem_4.clk, %arg_mem_4.reset, %arg_mem_4.content_en, %arg_mem_4.write_en, %arg_mem_4.write_data, %arg_mem_4.read_data, %arg_mem_4.done = calyx.seq_mem @arg_mem_4 <[600] x 32> [10] : i10, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_3.addr0, %arg_mem_3.clk, %arg_mem_3.reset, %arg_mem_3.content_en, %arg_mem_3.write_en, %arg_mem_3.write_data, %arg_mem_3.read_data, %arg_mem_3.done = calyx.seq_mem @arg_mem_3 <[10944] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_2.addr0, %arg_mem_2.clk, %arg_mem_2.reset, %arg_mem_2.content_en, %arg_mem_2.write_en, %arg_mem_2.write_data, %arg_mem_2.read_data, %arg_mem_2.done = calyx.seq_mem @arg_mem_2 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_1.addr0, %arg_mem_1.clk, %arg_mem_1.reset, %arg_mem_1.content_en, %arg_mem_1.write_en, %arg_mem_1.write_data, %arg_mem_1.read_data, %arg_mem_1.done = calyx.seq_mem @arg_mem_1 <[2] x 32> [1] : i1, i1, i1, i1, i1, i32, i32, i1
+    %arg_mem_0.addr0, %arg_mem_0.clk, %arg_mem_0.reset, %arg_mem_0.content_en, %arg_mem_0.write_en, %arg_mem_0.write_data, %arg_mem_0.read_data, %arg_mem_0.done = calyx.seq_mem @arg_mem_0 <[14400] x 32> [14] : i14, i1, i1, i1, i1, i32, i32, i1
+    calyx.wires {
+      calyx.group @assign_while_0_init_0 {
+        calyx.assign %while_0_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_0_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_0_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_1_init_0 {
+        calyx.assign %while_1_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_1_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_1_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_1_init_1 {
+        calyx.assign %while_1_arg1_reg.in = %while_2_arg2_reg.out : i32
+        calyx.assign %while_1_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_1_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_2_init_0 {
+        calyx.assign %while_2_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_2_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_2_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_2_init_1 {
+        calyx.assign %while_2_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_2_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_2_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_2_init_2 {
+        calyx.assign %while_2_arg2_reg.in = %c0_i32 : i32
+        calyx.assign %while_2_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_2_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_3_init_0 {
+        calyx.assign %while_3_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_3_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_3_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_4_init_0 {
+        calyx.assign %while_4_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_4_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_4_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_4_init_1 {
+        calyx.assign %while_4_arg1_reg.in = %while_5_arg3_reg.out : i32
+        calyx.assign %while_4_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_4_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_4_init_2 {
+        calyx.assign %while_4_arg2_reg.in = %muli_2_reg.out : i32
+        calyx.assign %while_4_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_4_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_5_init_0 {
+        calyx.assign %while_5_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_5_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_5_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_5_init_1 {
+        calyx.assign %while_5_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_5_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_5_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_5_init_2 {
+        calyx.assign %while_5_arg2_reg.in = %muli_0_reg.out : i32
+        calyx.assign %while_5_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_5_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_5_init_3 {
+        calyx.assign %while_5_arg3_reg.in = %muli_1_reg.out : i32
+        calyx.assign %while_5_arg3_reg.write_en = %true : i1
+        calyx.group_done %while_5_arg3_reg.done : i1
+      }
+      calyx.group @assign_while_6_init_0 {
+        calyx.assign %while_6_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_6_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_6_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_7_init_0 {
+        calyx.assign %while_7_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_7_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_7_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_7_init_1 {
+        calyx.assign %while_7_arg1_reg.in = %while_8_arg3_reg.out : i32
+        calyx.assign %while_7_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_7_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_8_init_0 {
+        calyx.assign %while_8_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_8_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_8_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_8_init_1 {
+        calyx.assign %while_8_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_8_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_8_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_8_init_2 {
+        calyx.assign %while_8_arg2_reg.in = %c0_i32 : i32
+        calyx.assign %while_8_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_8_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_8_init_3 {
+        calyx.assign %while_8_arg3_reg.in = %c0_i32 : i32
+        calyx.assign %while_8_arg3_reg.write_en = %true : i1
+        calyx.group_done %while_8_arg3_reg.done : i1
+      }
+      calyx.group @assign_while_9_init_0 {
+        calyx.assign %while_9_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_9_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_9_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_10_init_0 {
+        calyx.assign %while_10_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_10_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_10_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_10_init_1 {
+        calyx.assign %while_10_arg1_reg.in = %while_11_arg2_reg.out : i32
+        calyx.assign %while_10_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_10_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_11_init_0 {
+        calyx.assign %while_11_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_11_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_11_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_11_init_1 {
+        calyx.assign %while_11_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_11_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_11_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_11_init_2 {
+        calyx.assign %while_11_arg2_reg.in = %c0_i32 : i32
+        calyx.assign %while_11_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_11_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_12_init_0 {
+        calyx.assign %while_12_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_12_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_12_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_13_init_0 {
+        calyx.assign %while_13_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_13_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_13_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_13_init_1 {
+        calyx.assign %while_13_arg1_reg.in = %while_14_arg2_reg.out : i32
+        calyx.assign %while_13_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_13_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_14_init_0 {
+        calyx.assign %while_14_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_14_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_14_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_14_init_1 {
+        calyx.assign %while_14_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_14_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_14_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_14_init_2 {
+        calyx.assign %while_14_arg2_reg.in = %c0_i32 : i32
+        calyx.assign %while_14_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_14_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_15_init_0 {
+        calyx.assign %while_15_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_15_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_15_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_16_init_0 {
+        calyx.assign %while_16_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_16_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_16_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_16_init_1 {
+        calyx.assign %while_16_arg1_reg.in = %muli_3_reg.out : i32
+        calyx.assign %while_16_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_16_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_17_init_0 {
+        calyx.assign %while_17_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_17_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_17_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_17_init_1 {
+        calyx.assign %while_17_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_17_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_17_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_18_init_0 {
+        calyx.assign %while_18_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_18_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_18_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_18_init_1 {
+        calyx.assign %while_18_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_18_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_18_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_18_init_2 {
+        calyx.assign %while_18_arg2_reg.in = %while_19_arg3_reg.out : i32
+        calyx.assign %while_18_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_18_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_19_init_0 {
+        calyx.assign %while_19_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_19_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_19_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_19_init_1 {
+        calyx.assign %while_19_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_19_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_19_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_19_init_2 {
+        calyx.assign %while_19_arg2_reg.in = %c0_i32 : i32
+        calyx.assign %while_19_arg2_reg.write_en = %true : i1
+        calyx.group_done %while_19_arg2_reg.done : i1
+      }
+      calyx.group @assign_while_19_init_3 {
+        calyx.assign %while_19_arg3_reg.in = %c0_i32 : i32
+        calyx.assign %while_19_arg3_reg.write_en = %true : i1
+        calyx.group_done %while_19_arg3_reg.done : i1
+      }
+      calyx.group @assign_while_20_init_0 {
+        calyx.assign %while_20_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_20_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_20_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_20_init_1 {
+        calyx.assign %while_20_arg1_reg.in = %c0_i32 : i32
+        calyx.assign %while_20_arg1_reg.write_en = %true : i1
+        calyx.group_done %while_20_arg1_reg.done : i1
+      }
+      calyx.group @assign_while_21_init_0 {
+        calyx.assign %while_21_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_21_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_21_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_22_init_0 {
+        calyx.assign %while_22_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_22_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_22_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_23_init_0 {
+        calyx.assign %while_23_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_23_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_23_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_24_init_0 {
+        calyx.assign %while_24_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_24_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_24_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_25_init_0 {
+        calyx.assign %while_25_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_25_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_25_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_26_init_0 {
+        calyx.assign %while_26_arg0_reg.in = %c0_i32 : i32
+        calyx.assign %while_26_arg0_reg.write_en = %true : i1
+        calyx.group_done %while_26_arg0_reg.done : i1
+      }
+      calyx.comb_group @bb0_0 {
+        calyx.assign %std_slt_0.left = %while_2_arg0_reg.out : i32
+        calyx.assign %std_slt_0.right = %c8_i32 : i32
+      }
+      calyx.comb_group @bb0_2 {
+        calyx.assign %std_slt_1.left = %while_1_arg0_reg.out : i32
+        calyx.assign %std_slt_1.right = %c76_i32 : i32
+      }
+      calyx.comb_group @bb0_4 {
+        calyx.assign %std_slt_2.left = %while_0_arg0_reg.out : i32
+        calyx.assign %std_slt_2.right = %c56_i32 : i32
+      }
+      calyx.group @bb0_6 {
+        calyx.assign %std_slice_23.in = %while_2_arg0_reg.out : i32
+        calyx.assign %arg_mem_5.addr0 = %std_slice_23.out : i3
+        calyx.assign %arg_mem_5.content_en = %true : i1
+        calyx.assign %arg_mem_5.write_en = %false : i1
+        calyx.group_done %arg_mem_5.done : i1
+      }
+      calyx.group @bb0_8 {
+        calyx.assign %std_slice_22.in = %std_add_3.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_22.out : i16
+        calyx.assign %arg_mem_6.write_data = %arg_mem_5.read_data : i32
+        calyx.assign %arg_mem_6.write_en = %true : i1
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %std_add_3.left = %while_1_arg1_reg.out : i32
+        calyx.assign %std_add_3.right = %while_0_arg0_reg.out : i32
+        calyx.group_done %arg_mem_6.done : i1
+      }
+      calyx.group @assign_while_0_latch {
+        calyx.assign %while_0_arg0_reg.in = %std_add_2.out : i32
+        calyx.assign %while_0_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_2.left = %while_0_arg0_reg.out : i32
+        calyx.assign %std_add_2.right = %c1_i32 : i32
+        calyx.group_done %while_0_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_1_latch {
+        calyx.assign %while_1_arg0_reg.in = %std_add_1.out : i32
+        calyx.assign %while_1_arg0_reg.write_en = %true : i1
+        calyx.assign %while_1_arg1_reg.in = %std_add_4.out : i32
+        calyx.assign %while_1_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_1.left = %while_1_arg0_reg.out : i32
+        calyx.assign %std_add_1.right = %c1_i32 : i32
+        calyx.assign %std_add_4.left = %while_1_arg1_reg.out : i32
+        calyx.assign %std_add_4.right = %c56_i32 : i32
+        %0 = comb.and %while_1_arg1_reg.done, %while_1_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_2_latch {
+        calyx.assign %while_2_arg0_reg.in = %std_add_0.out : i32
+        calyx.assign %while_2_arg0_reg.write_en = %true : i1
+        calyx.assign %while_2_arg1_reg.in = %std_add_5.out : i32
+        calyx.assign %while_2_arg1_reg.write_en = %true : i1
+        calyx.assign %while_2_arg2_reg.in = %std_add_6.out : i32
+        calyx.assign %while_2_arg2_reg.write_en = %true : i1
+        calyx.assign %std_add_0.left = %while_2_arg0_reg.out : i32
+        calyx.assign %std_add_0.right = %c1_i32 : i32
+        calyx.assign %std_add_5.left = %while_2_arg1_reg.out : i32
+        calyx.assign %std_add_5.right = %c76_i32 : i32
+        calyx.assign %std_add_6.left = %while_2_arg2_reg.out : i32
+        calyx.assign %std_add_6.right = %c4256_i32 : i32
+        %0 = comb.and %while_2_arg2_reg.done, %while_2_arg1_reg.done, %while_2_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.comb_group @bb0_12 {
+        calyx.assign %std_slt_3.left = %while_8_arg0_reg.out : i32
+        calyx.assign %std_slt_3.right = %c8_i32 : i32
+      }
+      calyx.group @bb0_14 {
+        calyx.assign %std_mult_pipe_0.left = %while_8_arg1_reg.out : i32
+        calyx.assign %std_mult_pipe_0.right = %c5_i32 : i32
+        calyx.assign %muli_0_reg.in = %std_mult_pipe_0.out : i32
+        calyx.assign %muli_0_reg.write_en = %std_mult_pipe_0.done : i1
+        %0 = comb.xor %std_mult_pipe_0.done, %true : i1
+        calyx.assign %std_mult_pipe_0.go = %0 ? %true : i1
+        calyx.group_done %muli_0_reg.done : i1
+      }
+      calyx.comb_group @bb0_15 {
+        calyx.assign %std_slt_4.left = %while_7_arg0_reg.out : i32
+        calyx.assign %std_slt_4.right = %c76_i32 : i32
+      }
+      calyx.group @bb0_17 {
+        calyx.assign %std_mult_pipe_1.left = %while_7_arg0_reg.out : i32
+        calyx.assign %std_mult_pipe_1.right = %c60_i32 : i32
+        calyx.assign %muli_1_reg.in = %std_mult_pipe_1.out : i32
+        calyx.assign %muli_1_reg.write_en = %std_mult_pipe_1.done : i1
+        %0 = comb.xor %std_mult_pipe_1.done, %true : i1
+        calyx.assign %std_mult_pipe_1.go = %0 ? %true : i1
+        calyx.group_done %muli_1_reg.done : i1
+      }
+      calyx.comb_group @bb0_18 {
+        calyx.assign %std_slt_5.left = %while_6_arg0_reg.out : i32
+        calyx.assign %std_slt_5.right = %c56_i32 : i32
+      }
+      calyx.comb_group @bb0_21 {
+        calyx.assign %std_slt_6.left = %while_5_arg0_reg.out : i32
+        calyx.assign %std_slt_6.right = %c3_i32 : i32
+      }
+      calyx.group @bb0_23 {
+        calyx.assign %std_mult_pipe_2.left = %while_5_arg2_reg.out : i32
+        calyx.assign %std_mult_pipe_2.right = %c5_i32 : i32
+        calyx.assign %muli_2_reg.in = %std_mult_pipe_2.out : i32
+        calyx.assign %muli_2_reg.write_en = %std_mult_pipe_2.done : i1
+        %0 = comb.xor %std_mult_pipe_2.done, %true : i1
+        calyx.assign %std_mult_pipe_2.go = %0 ? %true : i1
+        calyx.group_done %muli_2_reg.done : i1
+      }
+      calyx.comb_group @bb0_24 {
+        calyx.assign %std_slt_7.left = %while_4_arg0_reg.out : i32
+        calyx.assign %std_slt_7.right = %c5_i32 : i32
+      }
+      calyx.comb_group @bb0_26 {
+        calyx.assign %std_slt_8.left = %while_3_arg0_reg.out : i32
+        calyx.assign %std_slt_8.right = %c5_i32 : i32
+      }
+      calyx.group @bb0_30 {
+        calyx.assign %std_slice_21.in = %std_add_15.out : i32
+        calyx.assign %arg_mem_0.addr0 = %std_slice_21.out : i14
+        calyx.assign %arg_mem_0.content_en = %true : i1
+        calyx.assign %arg_mem_0.write_en = %false : i1
+        calyx.assign %std_add_15.left = %while_4_arg1_reg.out : i32
+        calyx.assign %std_add_15.right = %std_add_14.out : i32
+        calyx.assign %std_add_14.left = %while_6_arg0_reg.out : i32
+        calyx.assign %std_add_14.right = %while_3_arg0_reg.out : i32
+        calyx.group_done %arg_mem_0.done : i1
+      }
+      calyx.group @bb0_32 {
+        calyx.assign %std_slice_20.in = %std_add_16.out : i32
+        calyx.assign %arg_mem_4.addr0 = %std_slice_20.out : i10
+        calyx.assign %arg_mem_4.content_en = %true : i1
+        calyx.assign %arg_mem_4.write_en = %false : i1
+        calyx.assign %std_add_16.left = %while_4_arg2_reg.out : i32
+        calyx.assign %std_add_16.right = %while_3_arg0_reg.out : i32
+        calyx.group_done %arg_mem_4.done : i1
+      }
+      calyx.group @bb0_33 {
+        calyx.assign %std_slice_19.in = %std_add_10.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_19.out : i16
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %arg_mem_6.write_en = %false : i1
+        calyx.assign %load_0_reg.in = %arg_mem_6.read_data : i32
+        calyx.assign %load_0_reg.write_en = %arg_mem_6.done : i1
+        calyx.assign %std_add_10.left = %while_7_arg1_reg.out : i32
+        calyx.assign %std_add_10.right = %while_6_arg0_reg.out : i32
+        calyx.group_done %load_0_reg.done : i1
+      }
+      calyx.group @bb0_34 {
+        calyx.assign %std_mulFN_0.left = %arg_mem_0.read_data : i32
+        calyx.assign %std_mulFN_0.right = %arg_mem_4.read_data : i32
+        calyx.assign %mulf_0_reg.in = %std_mulFN_0.out : i32
+        calyx.assign %mulf_0_reg.write_en = %std_mulFN_0.done : i1
+        %0 = comb.xor %std_mulFN_0.done, %true : i1
+        calyx.assign %std_mulFN_0.go = %0 ? %true : i1
+        calyx.group_done %mulf_0_reg.done : i1
+      }
+      calyx.group @bb0_35 {
+        calyx.assign %std_addFN_0.left = %load_0_reg.out : i32
+        calyx.assign %std_addFN_0.right = %mulf_0_reg.out : i32
+        calyx.assign %addf_0_reg.in = %std_addFN_0.out : i32
+        calyx.assign %addf_0_reg.write_en = %std_addFN_0.done : i1
+        %0 = comb.xor %std_addFN_0.done, %true : i1
+        calyx.assign %std_addFN_0.go = %0 ? %true : i1
+        calyx.assign %std_addFN_0.subOp = %false : i1
+        calyx.group_done %addf_0_reg.done : i1
+      }
+      calyx.group @bb0_36 {
+        calyx.assign %std_slice_18.in = %std_add_10.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_18.out : i16
+        calyx.assign %arg_mem_6.write_data = %addf_0_reg.out : i32
+        calyx.assign %arg_mem_6.write_en = %true : i1
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %std_add_10.left = %while_7_arg1_reg.out : i32
+        calyx.assign %std_add_10.right = %while_6_arg0_reg.out : i32
+        calyx.group_done %arg_mem_6.done : i1
+      }
+      calyx.group @assign_while_3_latch {
+        calyx.assign %while_3_arg0_reg.in = %std_add_13.out : i32
+        calyx.assign %while_3_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_13.left = %while_3_arg0_reg.out : i32
+        calyx.assign %std_add_13.right = %c1_i32 : i32
+        calyx.group_done %while_3_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_4_latch {
+        calyx.assign %while_4_arg0_reg.in = %std_add_12.out : i32
+        calyx.assign %while_4_arg0_reg.write_en = %true : i1
+        calyx.assign %while_4_arg1_reg.in = %std_add_17.out : i32
+        calyx.assign %while_4_arg1_reg.write_en = %true : i1
+        calyx.assign %while_4_arg2_reg.in = %std_add_18.out : i32
+        calyx.assign %while_4_arg2_reg.write_en = %true : i1
+        calyx.assign %std_add_12.left = %while_4_arg0_reg.out : i32
+        calyx.assign %std_add_12.right = %c1_i32 : i32
+        calyx.assign %std_add_17.left = %while_4_arg1_reg.out : i32
+        calyx.assign %std_add_17.right = %c60_i32 : i32
+        calyx.assign %std_add_18.left = %while_4_arg2_reg.out : i32
+        calyx.assign %std_add_18.right = %c5_i32 : i32
+        %0 = comb.and %while_4_arg2_reg.done, %while_4_arg1_reg.done, %while_4_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_5_latch {
+        calyx.assign %while_5_arg0_reg.in = %std_add_11.out : i32
+        calyx.assign %while_5_arg0_reg.write_en = %true : i1
+        calyx.assign %while_5_arg1_reg.in = %std_add_19.out : i32
+        calyx.assign %while_5_arg1_reg.write_en = %true : i1
+        calyx.assign %while_5_arg2_reg.in = %std_add_20.out : i32
+        calyx.assign %while_5_arg2_reg.write_en = %true : i1
+        calyx.assign %while_5_arg3_reg.in = %std_add_21.out : i32
+        calyx.assign %while_5_arg3_reg.write_en = %true : i1
+        calyx.assign %std_add_11.left = %while_5_arg0_reg.out : i32
+        calyx.assign %std_add_11.right = %c1_i32 : i32
+        calyx.assign %std_add_19.left = %while_5_arg1_reg.out : i32
+        calyx.assign %std_add_19.right = %c80_i32 : i32
+        calyx.assign %std_add_20.left = %while_5_arg2_reg.out : i32
+        calyx.assign %std_add_20.right = %c5_i32 : i32
+        calyx.assign %std_add_21.left = %while_5_arg3_reg.out : i32
+        calyx.assign %std_add_21.right = %c4800_i32 : i32
+        %0 = comb.and %while_5_arg3_reg.done, %while_5_arg2_reg.done, %while_5_arg1_reg.done, %while_5_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_6_latch {
+        calyx.assign %while_6_arg0_reg.in = %std_add_9.out : i32
+        calyx.assign %while_6_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_9.left = %while_6_arg0_reg.out : i32
+        calyx.assign %std_add_9.right = %c1_i32 : i32
+        calyx.group_done %while_6_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_7_latch {
+        calyx.assign %while_7_arg0_reg.in = %std_add_8.out : i32
+        calyx.assign %while_7_arg0_reg.write_en = %true : i1
+        calyx.assign %while_7_arg1_reg.in = %std_add_22.out : i32
+        calyx.assign %while_7_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_8.left = %while_7_arg0_reg.out : i32
+        calyx.assign %std_add_8.right = %c1_i32 : i32
+        calyx.assign %std_add_22.left = %while_7_arg1_reg.out : i32
+        calyx.assign %std_add_22.right = %c56_i32 : i32
+        %0 = comb.and %while_7_arg1_reg.done, %while_7_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_8_latch {
+        calyx.assign %while_8_arg0_reg.in = %std_add_7.out : i32
+        calyx.assign %while_8_arg0_reg.write_en = %true : i1
+        calyx.assign %while_8_arg1_reg.in = %std_add_23.out : i32
+        calyx.assign %while_8_arg1_reg.write_en = %true : i1
+        calyx.assign %while_8_arg2_reg.in = %std_add_24.out : i32
+        calyx.assign %while_8_arg2_reg.write_en = %true : i1
+        calyx.assign %while_8_arg3_reg.in = %std_add_25.out : i32
+        calyx.assign %while_8_arg3_reg.write_en = %true : i1
+        calyx.assign %std_add_7.left = %while_8_arg0_reg.out : i32
+        calyx.assign %std_add_7.right = %c1_i32 : i32
+        calyx.assign %std_add_23.left = %while_8_arg1_reg.out : i32
+        calyx.assign %std_add_23.right = %c3_i32 : i32
+        calyx.assign %std_add_24.left = %while_8_arg2_reg.out : i32
+        calyx.assign %std_add_24.right = %c76_i32 : i32
+        calyx.assign %std_add_25.left = %while_8_arg3_reg.out : i32
+        calyx.assign %std_add_25.right = %c4256_i32 : i32
+        %0 = comb.and %while_8_arg3_reg.done, %while_8_arg2_reg.done, %while_8_arg1_reg.done, %while_8_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.comb_group @bb0_46 {
+        calyx.assign %std_slt_9.left = %while_11_arg0_reg.out : i32
+        calyx.assign %std_slt_9.right = %c8_i32 : i32
+      }
+      calyx.comb_group @bb0_48 {
+        calyx.assign %std_slt_10.left = %while_10_arg0_reg.out : i32
+        calyx.assign %std_slt_10.right = %c76_i32 : i32
+      }
+      calyx.comb_group @bb0_50 {
+        calyx.assign %std_slt_11.left = %while_9_arg0_reg.out : i32
+        calyx.assign %std_slt_11.right = %c56_i32 : i32
+      }
+      calyx.group @bb0_53 {
+        calyx.assign %std_slice_17.in = %std_add_29.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_17.out : i16
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %arg_mem_6.write_en = %false : i1
+        calyx.assign %load_1_reg.in = %arg_mem_6.read_data : i32
+        calyx.assign %load_1_reg.write_en = %arg_mem_6.done : i1
+        calyx.assign %std_add_29.left = %while_10_arg1_reg.out : i32
+        calyx.assign %std_add_29.right = %while_9_arg0_reg.out : i32
+        calyx.group_done %load_1_reg.done : i1
+      }
+      calyx.group @bb0_54 {
+        calyx.assign %std_compareFN_0.left = %load_1_reg.out : i32
+        calyx.assign %std_compareFN_0.right = %cst_0 : i32
+        calyx.assign %std_compareFN_0.signaling = %true : i1
+        calyx.assign %compare_port_0_reg.write_en = %std_compareFN_0.done : i1
+        calyx.assign %compare_port_0_reg.in = %std_compareFN_0.gt : i1
+        calyx.assign %unordered_port_0_reg.write_en = %std_compareFN_0.done : i1
+        calyx.assign %unordered_port_0_reg.in = %std_compareFN_0.unordered : i1
+        calyx.assign %std_or_0.left = %compare_port_0_reg.out : i1
+        calyx.assign %std_or_0.right = %unordered_port_0_reg.out : i1
+        calyx.assign %std_and_0.left = %compare_port_0_reg.done : i1
+        calyx.assign %std_and_0.right = %unordered_port_0_reg.done : i1
+        calyx.assign %cmpf_0_reg.in = %std_or_0.out : i1
+        calyx.assign %cmpf_0_reg.write_en = %std_and_0.out : i1
+        %0 = comb.xor %std_compareFN_0.done, %true : i1
+        calyx.assign %std_compareFN_0.go = %0 ? %true : i1
+        calyx.group_done %cmpf_0_reg.done : i1
+      }
+      calyx.group @bb0_56 {
+        calyx.assign %std_slice_16.in = %std_add_29.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_16.out : i16
+        calyx.assign %arg_mem_6.write_data = %std_mux_0.out : i32
+        calyx.assign %arg_mem_6.write_en = %true : i1
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %std_add_29.left = %while_10_arg1_reg.out : i32
+        calyx.assign %std_add_29.right = %while_9_arg0_reg.out : i32
+        calyx.assign %std_mux_0.cond = %cmpf_0_reg.out : i1
+        calyx.assign %std_mux_0.tru = %load_1_reg.out : i32
+        calyx.assign %std_mux_0.fal = %cst_0 : i32
+        calyx.group_done %arg_mem_6.done : i1
+      }
+      calyx.group @assign_while_9_latch {
+        calyx.assign %while_9_arg0_reg.in = %std_add_28.out : i32
+        calyx.assign %while_9_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_28.left = %while_9_arg0_reg.out : i32
+        calyx.assign %std_add_28.right = %c1_i32 : i32
+        calyx.group_done %while_9_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_10_latch {
+        calyx.assign %while_10_arg0_reg.in = %std_add_27.out : i32
+        calyx.assign %while_10_arg0_reg.write_en = %true : i1
+        calyx.assign %while_10_arg1_reg.in = %std_add_30.out : i32
+        calyx.assign %while_10_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_27.left = %while_10_arg0_reg.out : i32
+        calyx.assign %std_add_27.right = %c1_i32 : i32
+        calyx.assign %std_add_30.left = %while_10_arg1_reg.out : i32
+        calyx.assign %std_add_30.right = %c56_i32 : i32
+        %0 = comb.and %while_10_arg1_reg.done, %while_10_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_11_latch {
+        calyx.assign %while_11_arg0_reg.in = %std_add_26.out : i32
+        calyx.assign %while_11_arg0_reg.write_en = %true : i1
+        calyx.assign %while_11_arg1_reg.in = %std_add_31.out : i32
+        calyx.assign %while_11_arg1_reg.write_en = %true : i1
+        calyx.assign %while_11_arg2_reg.in = %std_add_32.out : i32
+        calyx.assign %while_11_arg2_reg.write_en = %true : i1
+        calyx.assign %std_add_26.left = %while_11_arg0_reg.out : i32
+        calyx.assign %std_add_26.right = %c1_i32 : i32
+        calyx.assign %std_add_31.left = %while_11_arg1_reg.out : i32
+        calyx.assign %std_add_31.right = %c76_i32 : i32
+        calyx.assign %std_add_32.left = %while_11_arg2_reg.out : i32
+        calyx.assign %std_add_32.right = %c4256_i32 : i32
+        %0 = comb.and %while_11_arg2_reg.done, %while_11_arg1_reg.done, %while_11_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.comb_group @bb0_60 {
+        calyx.assign %std_slt_12.left = %while_14_arg0_reg.out : i32
+        calyx.assign %std_slt_12.right = %c8_i32 : i32
+      }
+      calyx.comb_group @bb0_62 {
+        calyx.assign %std_slt_13.left = %while_13_arg0_reg.out : i32
+        calyx.assign %std_slt_13.right = %c38_i32 : i32
+      }
+      calyx.comb_group @bb0_64 {
+        calyx.assign %std_slt_14.left = %while_12_arg0_reg.out : i32
+        calyx.assign %std_slt_14.right = %c18_i32 : i32
+      }
+      calyx.group @bb0_67 {
+        calyx.assign %std_slice_15.in = %std_add_36.out : i32
+        calyx.assign %arg_mem_7.addr0 = %std_slice_15.out : i13
+        calyx.assign %arg_mem_7.write_data = %cst : i32
+        calyx.assign %arg_mem_7.write_en = %true : i1
+        calyx.assign %arg_mem_7.content_en = %true : i1
+        calyx.assign %std_add_36.left = %while_13_arg1_reg.out : i32
+        calyx.assign %std_add_36.right = %while_12_arg0_reg.out : i32
+        calyx.group_done %arg_mem_7.done : i1
+      }
+      calyx.group @assign_while_12_latch {
+        calyx.assign %while_12_arg0_reg.in = %std_add_35.out : i32
+        calyx.assign %while_12_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_35.left = %while_12_arg0_reg.out : i32
+        calyx.assign %std_add_35.right = %c1_i32 : i32
+        calyx.group_done %while_12_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_13_latch {
+        calyx.assign %while_13_arg0_reg.in = %std_add_34.out : i32
+        calyx.assign %while_13_arg0_reg.write_en = %true : i1
+        calyx.assign %while_13_arg1_reg.in = %std_add_37.out : i32
+        calyx.assign %while_13_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_34.left = %while_13_arg0_reg.out : i32
+        calyx.assign %std_add_34.right = %c1_i32 : i32
+        calyx.assign %std_add_37.left = %while_13_arg1_reg.out : i32
+        calyx.assign %std_add_37.right = %c18_i32 : i32
+        %0 = comb.and %while_13_arg1_reg.done, %while_13_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_14_latch {
+        calyx.assign %while_14_arg0_reg.in = %std_add_33.out : i32
+        calyx.assign %while_14_arg0_reg.write_en = %true : i1
+        calyx.assign %while_14_arg1_reg.in = %std_add_38.out : i32
+        calyx.assign %while_14_arg1_reg.write_en = %true : i1
+        calyx.assign %while_14_arg2_reg.in = %std_add_39.out : i32
+        calyx.assign %while_14_arg2_reg.write_en = %true : i1
+        calyx.assign %std_add_33.left = %while_14_arg0_reg.out : i32
+        calyx.assign %std_add_33.right = %c1_i32 : i32
+        calyx.assign %std_add_38.left = %while_14_arg1_reg.out : i32
+        calyx.assign %std_add_38.right = %c38_i32 : i32
+        calyx.assign %std_add_39.left = %while_14_arg2_reg.out : i32
+        calyx.assign %std_add_39.right = %c684_i32 : i32
+        %0 = comb.and %while_14_arg2_reg.done, %while_14_arg1_reg.done, %while_14_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.comb_group @bb0_71 {
+        calyx.assign %std_slt_15.left = %while_19_arg0_reg.out : i32
+        calyx.assign %std_slt_15.right = %c8_i32 : i32
+      }
+      calyx.comb_group @bb0_73 {
+        calyx.assign %std_slt_16.left = %while_18_arg0_reg.out : i32
+        calyx.assign %std_slt_16.right = %c38_i32 : i32
+      }
+      calyx.group @bb0_76 {
+        calyx.assign %std_mult_pipe_3.left = %std_add_42.out : i32
+        calyx.assign %std_mult_pipe_3.right = %c56_i32 : i32
+        calyx.assign %muli_3_reg.in = %std_mult_pipe_3.out : i32
+        calyx.assign %muli_3_reg.write_en = %std_mult_pipe_3.done : i1
+        %0 = comb.xor %std_mult_pipe_3.done, %true : i1
+        calyx.assign %std_mult_pipe_3.go = %0 ? %true : i1
+        calyx.assign %std_add_42.left = %while_18_arg1_reg.out : i32
+        calyx.assign %std_add_42.right = %while_19_arg1_reg.out : i32
+        calyx.group_done %muli_3_reg.done : i1
+      }
+      calyx.comb_group @bb0_77 {
+        calyx.assign %std_slt_17.left = %while_17_arg0_reg.out : i32
+        calyx.assign %std_slt_17.right = %c18_i32 : i32
+      }
+      calyx.comb_group @bb0_80 {
+        calyx.assign %std_slt_18.left = %while_16_arg0_reg.out : i32
+        calyx.assign %std_slt_18.right = %c2_i32 : i32
+      }
+      calyx.comb_group @bb0_82 {
+        calyx.assign %std_slt_19.left = %while_15_arg0_reg.out : i32
+        calyx.assign %std_slt_19.right = %c3_i32 : i32
+      }
+      calyx.group @bb0_86 {
+        calyx.assign %std_slice_14.in = %std_add_48.out : i32
+        calyx.assign %arg_mem_6.addr0 = %std_slice_14.out : i16
+        calyx.assign %arg_mem_6.content_en = %true : i1
+        calyx.assign %arg_mem_6.write_en = %false : i1
+        calyx.assign %load_2_reg.in = %arg_mem_6.read_data : i32
+        calyx.assign %load_2_reg.write_en = %arg_mem_6.done : i1
+        calyx.assign %std_add_48.left = %while_16_arg1_reg.out : i32
+        calyx.assign %std_add_48.right = %std_add_47.out : i32
+        calyx.assign %std_add_47.left = %while_17_arg1_reg.out : i32
+        calyx.assign %std_add_47.right = %while_15_arg0_reg.out : i32
+        calyx.group_done %load_2_reg.done : i1
+      }
+      calyx.group @bb0_87 {
+        calyx.assign %std_slice_13.in = %std_add_44.out : i32
+        calyx.assign %arg_mem_7.addr0 = %std_slice_13.out : i13
+        calyx.assign %arg_mem_7.content_en = %true : i1
+        calyx.assign %arg_mem_7.write_en = %false : i1
+        calyx.assign %load_3_reg.in = %arg_mem_7.read_data : i32
+        calyx.assign %load_3_reg.write_en = %arg_mem_7.done : i1
+        calyx.assign %std_add_44.left = %while_18_arg2_reg.out : i32
+        calyx.assign %std_add_44.right = %while_17_arg0_reg.out : i32
+        calyx.group_done %load_3_reg.done : i1
+      }
+      calyx.group @bb0_88 {
+        calyx.assign %std_compareFN_1.left = %load_3_reg.out : i32
+        calyx.assign %std_compareFN_1.right = %load_2_reg.out : i32
+        calyx.assign %std_compareFN_1.signaling = %true : i1
+        calyx.assign %compare_port_1_reg.write_en = %std_compareFN_1.done : i1
+        calyx.assign %compare_port_1_reg.in = %std_compareFN_1.gt : i1
+        calyx.assign %unordered_port_1_reg.write_en = %std_compareFN_1.done : i1
+        calyx.assign %unordered_port_1_reg.in = %std_compareFN_1.unordered : i1
+        calyx.assign %std_or_1.left = %compare_port_1_reg.out : i1
+        calyx.assign %std_or_1.right = %unordered_port_1_reg.out : i1
+        calyx.assign %std_and_1.left = %compare_port_1_reg.done : i1
+        calyx.assign %std_and_1.right = %unordered_port_1_reg.done : i1
+        calyx.assign %cmpf_1_reg.in = %std_or_1.out : i1
+        calyx.assign %cmpf_1_reg.write_en = %std_and_1.out : i1
+        %0 = comb.xor %std_compareFN_1.done, %true : i1
+        calyx.assign %std_compareFN_1.go = %0 ? %true : i1
+        calyx.group_done %cmpf_1_reg.done : i1
+      }
+      calyx.group @bb0_90 {
+        calyx.assign %std_compareFN_2.left = %load_2_reg.out : i32
+        calyx.assign %std_compareFN_2.right = %load_2_reg.out : i32
+        calyx.assign %std_compareFN_2.signaling = %false : i1
+        calyx.assign %unordered_port_2_reg.write_en = %std_compareFN_2.done : i1
+        calyx.assign %unordered_port_2_reg.in = %std_compareFN_2.unordered : i1
+        calyx.assign %cmpf_2_reg.in = %unordered_port_2_reg.out : i1
+        calyx.assign %cmpf_2_reg.write_en = %unordered_port_2_reg.done : i1
+        %0 = comb.xor %std_compareFN_2.done, %true : i1
+        calyx.assign %std_compareFN_2.go = %0 ? %true : i1
+        calyx.group_done %cmpf_2_reg.done : i1
+      }
+      calyx.group @bb0_92 {
+        calyx.assign %std_slice_12.in = %std_add_44.out : i32
+        calyx.assign %arg_mem_7.addr0 = %std_slice_12.out : i13
+        calyx.assign %arg_mem_7.write_data = %std_mux_2.out : i32
+        calyx.assign %arg_mem_7.write_en = %true : i1
+        calyx.assign %arg_mem_7.content_en = %true : i1
+        calyx.assign %std_add_44.left = %while_18_arg2_reg.out : i32
+        calyx.assign %std_add_44.right = %while_17_arg0_reg.out : i32
+        calyx.assign %std_mux_2.cond = %cmpf_2_reg.out : i1
+        calyx.assign %std_mux_2.tru = %load_2_reg.out : i32
+        calyx.assign %std_mux_2.fal = %std_mux_1.out : i32
+        calyx.assign %std_mux_1.cond = %cmpf_1_reg.out : i1
+        calyx.assign %std_mux_1.tru = %load_3_reg.out : i32
+        calyx.assign %std_mux_1.fal = %load_2_reg.out : i32
+        calyx.group_done %arg_mem_7.done : i1
+      }
+      calyx.group @assign_while_15_latch {
+        calyx.assign %while_15_arg0_reg.in = %std_add_46.out : i32
+        calyx.assign %while_15_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_46.left = %while_15_arg0_reg.out : i32
+        calyx.assign %std_add_46.right = %c1_i32 : i32
+        calyx.group_done %while_15_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_16_latch {
+        calyx.assign %while_16_arg0_reg.in = %std_add_45.out : i32
+        calyx.assign %while_16_arg0_reg.write_en = %true : i1
+        calyx.assign %while_16_arg1_reg.in = %std_add_49.out : i32
+        calyx.assign %while_16_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_45.left = %while_16_arg0_reg.out : i32
+        calyx.assign %std_add_45.right = %c1_i32 : i32
+        calyx.assign %std_add_49.left = %while_16_arg1_reg.out : i32
+        calyx.assign %std_add_49.right = %c56_i32 : i32
+        %0 = comb.and %while_16_arg1_reg.done, %while_16_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_17_latch {
+        calyx.assign %while_17_arg0_reg.in = %std_add_43.out : i32
+        calyx.assign %while_17_arg0_reg.write_en = %true : i1
+        calyx.assign %while_17_arg1_reg.in = %std_add_50.out : i32
+        calyx.assign %while_17_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_43.left = %while_17_arg0_reg.out : i32
+        calyx.assign %std_add_43.right = %c1_i32 : i32
+        calyx.assign %std_add_50.left = %while_17_arg1_reg.out : i32
+        calyx.assign %std_add_50.right = %c3_i32 : i32
+        %0 = comb.and %while_17_arg1_reg.done, %while_17_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_18_latch {
+        calyx.assign %while_18_arg0_reg.in = %std_add_41.out : i32
+        calyx.assign %while_18_arg0_reg.write_en = %true : i1
+        calyx.assign %while_18_arg1_reg.in = %std_add_51.out : i32
+        calyx.assign %while_18_arg1_reg.write_en = %true : i1
+        calyx.assign %while_18_arg2_reg.in = %std_add_52.out : i32
+        calyx.assign %while_18_arg2_reg.write_en = %true : i1
+        calyx.assign %std_add_41.left = %while_18_arg0_reg.out : i32
+        calyx.assign %std_add_41.right = %c1_i32 : i32
+        calyx.assign %std_add_51.left = %while_18_arg1_reg.out : i32
+        calyx.assign %std_add_51.right = %c2_i32 : i32
+        calyx.assign %std_add_52.left = %while_18_arg2_reg.out : i32
+        calyx.assign %std_add_52.right = %c18_i32 : i32
+        %0 = comb.and %while_18_arg2_reg.done, %while_18_arg1_reg.done, %while_18_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_19_latch {
+        calyx.assign %while_19_arg0_reg.in = %std_add_40.out : i32
+        calyx.assign %while_19_arg0_reg.write_en = %true : i1
+        calyx.assign %while_19_arg1_reg.in = %std_add_53.out : i32
+        calyx.assign %while_19_arg1_reg.write_en = %true : i1
+        calyx.assign %while_19_arg2_reg.in = %std_add_54.out : i32
+        calyx.assign %while_19_arg2_reg.write_en = %true : i1
+        calyx.assign %while_19_arg3_reg.in = %std_add_55.out : i32
+        calyx.assign %while_19_arg3_reg.write_en = %true : i1
+        calyx.assign %std_add_40.left = %while_19_arg0_reg.out : i32
+        calyx.assign %std_add_40.right = %c1_i32 : i32
+        calyx.assign %std_add_53.left = %while_19_arg1_reg.out : i32
+        calyx.assign %std_add_53.right = %c76_i32 : i32
+        calyx.assign %std_add_54.left = %while_19_arg2_reg.out : i32
+        calyx.assign %std_add_54.right = %c38_i32 : i32
+        calyx.assign %std_add_55.left = %while_19_arg3_reg.out : i32
+        calyx.assign %std_add_55.right = %c684_i32 : i32
+        %0 = comb.and %while_19_arg3_reg.done, %while_19_arg2_reg.done, %while_19_arg1_reg.done, %while_19_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.comb_group @bb0_100 {
+        calyx.assign %std_slt_20.left = %while_21_arg0_reg.out : i32
+        calyx.assign %std_slt_20.right = %c5472_i32 : i32
+      }
+      calyx.comb_group @bb0_103 {
+        calyx.assign %std_slt_21.left = %while_20_arg0_reg.out : i32
+        calyx.assign %std_slt_21.right = %c2_i32 : i32
+      }
+      calyx.group @bb0_106 {
+        calyx.assign %std_slice_11.in = %std_add_58.out : i32
+        calyx.assign %arg_mem_3.addr0 = %std_slice_11.out : i14
+        calyx.assign %arg_mem_3.content_en = %true : i1
+        calyx.assign %arg_mem_3.write_en = %false : i1
+        calyx.assign %std_add_58.left = %while_20_arg1_reg.out : i32
+        calyx.assign %std_add_58.right = %while_21_arg0_reg.out : i32
+        calyx.group_done %arg_mem_3.done : i1
+      }
+      calyx.group @bb0_108 {
+        calyx.assign %std_slice_10.in = %std_add_59.out : i32
+        calyx.assign %arg_mem_8.addr0 = %std_slice_10.out : i14
+        calyx.assign %arg_mem_8.write_data = %arg_mem_3.read_data : i32
+        calyx.assign %arg_mem_8.write_en = %true : i1
+        calyx.assign %arg_mem_8.content_en = %true : i1
+        calyx.assign %std_add_59.left = %std_lsh_0.out : i32
+        calyx.assign %std_lsh_0.left = %while_21_arg0_reg.out : i32
+        calyx.assign %std_lsh_0.right = %c1_i32 : i32
+        calyx.assign %std_add_59.right = %while_20_arg0_reg.out : i32
+        calyx.group_done %arg_mem_8.done : i1
+      }
+      calyx.group @assign_while_20_latch {
+        calyx.assign %while_20_arg0_reg.in = %std_add_57.out : i32
+        calyx.assign %while_20_arg0_reg.write_en = %true : i1
+        calyx.assign %while_20_arg1_reg.in = %std_add_60.out : i32
+        calyx.assign %while_20_arg1_reg.write_en = %true : i1
+        calyx.assign %std_add_57.left = %while_20_arg0_reg.out : i32
+        calyx.assign %std_add_57.right = %c1_i32 : i32
+        calyx.assign %std_add_60.left = %while_20_arg1_reg.out : i32
+        calyx.assign %std_add_60.right = %c5472_i32 : i32
+        %0 = comb.and %while_20_arg1_reg.done, %while_20_arg0_reg.done : i1
+        calyx.group_done %0 ? %true : i1
+      }
+      calyx.group @assign_while_21_latch {
+        calyx.assign %while_21_arg0_reg.in = %std_add_56.out : i32
+        calyx.assign %while_21_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_56.left = %while_21_arg0_reg.out : i32
+        calyx.assign %std_add_56.right = %c1_i32 : i32
+        calyx.group_done %while_21_arg0_reg.done : i1
+      }
+      calyx.comb_group @bb0_110 {
+        calyx.assign %std_slt_22.left = %while_22_arg0_reg.out : i32
+        calyx.assign %std_slt_22.right = %c2_i32 : i32
+      }
+      calyx.group @bb0_112 {
+        calyx.assign %std_slice_9.in = %while_22_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_9.out : i1
+        calyx.assign %arg_mem_9.write_data = %cst_0 : i32
+        calyx.assign %arg_mem_9.write_en = %true : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.group_done %arg_mem_9.done : i1
+      }
+      calyx.group @assign_while_22_latch {
+        calyx.assign %while_22_arg0_reg.in = %std_add_61.out : i32
+        calyx.assign %while_22_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_61.left = %while_22_arg0_reg.out : i32
+        calyx.assign %std_add_61.right = %c1_i32 : i32
+        calyx.group_done %while_22_arg0_reg.done : i1
+      }
+      calyx.comb_group @bb0_113 {
+        calyx.assign %std_slt_23.left = %while_24_arg0_reg.out : i32
+        calyx.assign %std_slt_23.right = %c2_i32 : i32
+      }
+      calyx.comb_group @bb0_115 {
+        calyx.assign %std_slt_24.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_slt_24.right = %c5472_i32 : i32
+      }
+      calyx.group @bb0_117 {
+        calyx.assign %std_divs_pipe_0.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_divs_pipe_0.right = %c684_i32 : i32
+        calyx.assign %divsi_0_reg.in = %std_divs_pipe_0.out_quotient : i32
+        calyx.assign %divsi_0_reg.write_en = %std_divs_pipe_0.done : i1
+        %0 = comb.xor %std_divs_pipe_0.done, %true : i1
+        calyx.assign %std_divs_pipe_0.go = %0 ? %true : i1
+        calyx.group_done %divsi_0_reg.done : i1
+      }
+      calyx.group @bb0_118 {
+        calyx.assign %std_mult_pipe_4.left = %divsi_0_reg.out : i32
+        calyx.assign %std_mult_pipe_4.right = %c684_i32 : i32
+        calyx.assign %muli_4_reg.in = %std_mult_pipe_4.out : i32
+        calyx.assign %muli_4_reg.write_en = %std_mult_pipe_4.done : i1
+        %0 = comb.xor %std_mult_pipe_4.done, %true : i1
+        calyx.assign %std_mult_pipe_4.go = %0 ? %true : i1
+        calyx.group_done %muli_4_reg.done : i1
+      }
+      calyx.group @bb0_124 {
+        calyx.assign %std_rems_pipe_0.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_rems_pipe_0.right = %c684_i32 : i32
+        calyx.assign %remsi_0_reg.in = %std_rems_pipe_0.out_remainder : i32
+        calyx.assign %remsi_0_reg.write_en = %std_rems_pipe_0.done : i1
+        %0 = comb.xor %std_rems_pipe_0.done, %true : i1
+        calyx.assign %std_rems_pipe_0.go = %0 ? %true : i1
+        calyx.group_done %remsi_0_reg.done : i1
+      }
+      calyx.group @bb0_128 {
+        calyx.assign %std_divs_pipe_1.left = %std_mux_4.out : i32
+        calyx.assign %std_divs_pipe_1.right = %c18_i32 : i32
+        calyx.assign %divsi_1_reg.in = %std_divs_pipe_1.out_quotient : i32
+        calyx.assign %divsi_1_reg.write_en = %std_divs_pipe_1.done : i1
+        %0 = comb.xor %std_divs_pipe_1.done, %true : i1
+        calyx.assign %std_divs_pipe_1.go = %0 ? %true : i1
+        calyx.assign %std_mux_4.cond = %std_slt_26.out : i1
+        calyx.assign %std_slt_26.left = %remsi_0_reg.out : i32
+        calyx.assign %std_slt_26.right = %c0_i32 : i32
+        calyx.assign %std_mux_4.tru = %std_add_65.out : i32
+        calyx.assign %std_add_65.left = %remsi_0_reg.out : i32
+        calyx.assign %std_add_65.right = %c684_i32 : i32
+        calyx.assign %std_mux_4.fal = %remsi_0_reg.out : i32
+        calyx.group_done %divsi_1_reg.done : i1
+      }
+      calyx.group @bb0_129 {
+        calyx.assign %std_rems_pipe_1.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_rems_pipe_1.right = %c18_i32 : i32
+        calyx.assign %remsi_1_reg.in = %std_rems_pipe_1.out_remainder : i32
+        calyx.assign %remsi_1_reg.write_en = %std_rems_pipe_1.done : i1
+        %0 = comb.xor %std_rems_pipe_1.done, %true : i1
+        calyx.assign %std_rems_pipe_1.go = %0 ? %true : i1
+        calyx.group_done %remsi_1_reg.done : i1
+      }
+      calyx.group @bb0_133 {
+        calyx.assign %std_mult_pipe_5.left = %std_mux_3.out : i32
+        calyx.assign %std_mult_pipe_5.right = %c38_i32 : i32
+        calyx.assign %muli_5_reg.in = %std_mult_pipe_5.out : i32
+        calyx.assign %muli_5_reg.write_en = %std_mult_pipe_5.done : i1
+        %0 = comb.xor %std_mult_pipe_5.done, %true : i1
+        calyx.assign %std_mult_pipe_5.go = %0 ? %true : i1
+        calyx.assign %std_mux_3.cond = %std_and_2.out : i1
+        calyx.assign %std_and_2.left = %std_neq_0.out : i1
+        calyx.assign %std_neq_0.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_neq_0.right = %muli_4_reg.out : i32
+        calyx.assign %std_and_2.right = %std_slt_25.out : i1
+        calyx.assign %std_slt_25.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_slt_25.right = %c0_i32 : i32
+        calyx.assign %std_mux_3.tru = %std_add_64.out : i32
+        calyx.assign %std_add_64.left = %divsi_0_reg.out : i32
+        calyx.assign %std_add_64.right = %c-1_i32 : i32
+        calyx.assign %std_mux_3.fal = %divsi_0_reg.out : i32
+        calyx.group_done %muli_5_reg.done : i1
+      }
+      calyx.group @bb0_135 {
+        calyx.assign %std_mult_pipe_6.left = %std_add_67.out : i32
+        calyx.assign %std_mult_pipe_6.right = %c18_i32 : i32
+        calyx.assign %muli_6_reg.in = %std_mult_pipe_6.out : i32
+        calyx.assign %muli_6_reg.write_en = %std_mult_pipe_6.done : i1
+        %0 = comb.xor %std_mult_pipe_6.done, %true : i1
+        calyx.assign %std_mult_pipe_6.go = %0 ? %true : i1
+        calyx.assign %std_add_67.left = %muli_5_reg.out : i32
+        calyx.assign %std_add_67.right = %divsi_1_reg.out : i32
+        calyx.group_done %muli_6_reg.done : i1
+      }
+      calyx.group @bb0_137 {
+        calyx.assign %std_slice_8.in = %std_add_68.out : i32
+        calyx.assign %arg_mem_7.addr0 = %std_slice_8.out : i13
+        calyx.assign %arg_mem_7.content_en = %true : i1
+        calyx.assign %arg_mem_7.write_en = %false : i1
+        calyx.assign %load_4_reg.in = %arg_mem_7.read_data : i32
+        calyx.assign %load_4_reg.write_en = %arg_mem_7.done : i1
+        calyx.assign %std_add_68.left = %muli_6_reg.out : i32
+        calyx.assign %std_add_68.right = %std_mux_5.out : i32
+        calyx.assign %std_mux_5.cond = %std_slt_27.out : i1
+        calyx.assign %std_slt_27.left = %remsi_1_reg.out : i32
+        calyx.assign %std_slt_27.right = %c0_i32 : i32
+        calyx.assign %std_mux_5.tru = %std_add_66.out : i32
+        calyx.assign %std_add_66.left = %remsi_1_reg.out : i32
+        calyx.assign %std_add_66.right = %c18_i32 : i32
+        calyx.assign %std_mux_5.fal = %remsi_1_reg.out : i32
+        calyx.group_done %load_4_reg.done : i1
+      }
+      calyx.group @bb0_140 {
+        calyx.assign %std_slice_7.in = %std_add_69.out : i32
+        calyx.assign %arg_mem_8.addr0 = %std_slice_7.out : i14
+        calyx.assign %arg_mem_8.content_en = %true : i1
+        calyx.assign %arg_mem_8.write_en = %false : i1
+        calyx.assign %load_5_reg.in = %arg_mem_8.read_data : i32
+        calyx.assign %load_5_reg.write_en = %arg_mem_8.done : i1
+        calyx.assign %std_add_69.left = %std_lsh_1.out : i32
+        calyx.assign %std_lsh_1.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_lsh_1.right = %c1_i32 : i32
+        calyx.assign %std_add_69.right = %while_24_arg0_reg.out : i32
+        calyx.group_done %load_5_reg.done : i1
+      }
+      calyx.group @bb0_141 {
+        calyx.assign %std_slice_6.in = %while_24_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_6.out : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.assign %arg_mem_9.write_en = %false : i1
+        calyx.assign %load_6_reg.in = %arg_mem_9.read_data : i32
+        calyx.assign %load_6_reg.write_en = %arg_mem_9.done : i1
+        calyx.group_done %load_6_reg.done : i1
+      }
+      calyx.group @bb0_142 {
+        calyx.assign %std_mulFN_1.left = %load_4_reg.out : i32
+        calyx.assign %std_mulFN_1.right = %load_5_reg.out : i32
+        calyx.assign %mulf_1_reg.in = %std_mulFN_1.out : i32
+        calyx.assign %mulf_1_reg.write_en = %std_mulFN_1.done : i1
+        %0 = comb.xor %std_mulFN_1.done, %true : i1
+        calyx.assign %std_mulFN_1.go = %0 ? %true : i1
+        calyx.group_done %mulf_1_reg.done : i1
+      }
+      calyx.group @bb0_143 {
+        calyx.assign %std_addFN_1.left = %load_6_reg.out : i32
+        calyx.assign %std_addFN_1.right = %mulf_1_reg.out : i32
+        calyx.assign %addf_1_reg.in = %std_addFN_1.out : i32
+        calyx.assign %addf_1_reg.write_en = %std_addFN_1.done : i1
+        %0 = comb.xor %std_addFN_1.done, %true : i1
+        calyx.assign %std_addFN_1.go = %0 ? %true : i1
+        calyx.assign %std_addFN_1.subOp = %false : i1
+        calyx.group_done %addf_1_reg.done : i1
+      }
+      calyx.group @bb0_144 {
+        calyx.assign %std_slice_5.in = %while_24_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_5.out : i1
+        calyx.assign %arg_mem_9.write_data = %addf_1_reg.out : i32
+        calyx.assign %arg_mem_9.write_en = %true : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.group_done %arg_mem_9.done : i1
+      }
+      calyx.group @assign_while_23_latch {
+        calyx.assign %while_23_arg0_reg.in = %std_add_63.out : i32
+        calyx.assign %while_23_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_63.left = %while_23_arg0_reg.out : i32
+        calyx.assign %std_add_63.right = %c1_i32 : i32
+        calyx.group_done %while_23_arg0_reg.done : i1
+      }
+      calyx.group @assign_while_24_latch {
+        calyx.assign %while_24_arg0_reg.in = %std_add_62.out : i32
+        calyx.assign %while_24_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_62.left = %while_24_arg0_reg.out : i32
+        calyx.assign %std_add_62.right = %c1_i32 : i32
+        calyx.group_done %while_24_arg0_reg.done : i1
+      }
+      calyx.comb_group @bb0_145 {
+        calyx.assign %std_slt_28.left = %while_25_arg0_reg.out : i32
+        calyx.assign %std_slt_28.right = %c2_i32 : i32
+      }
+      calyx.group @bb0_147 {
+        calyx.assign %std_slice_4.in = %while_25_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_4.out : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.assign %arg_mem_9.write_en = %false : i1
+        calyx.assign %load_7_reg.in = %arg_mem_9.read_data : i32
+        calyx.assign %load_7_reg.write_en = %arg_mem_9.done : i1
+        calyx.group_done %load_7_reg.done : i1
+      }
+      calyx.group @bb0_148 {
+        calyx.assign %std_slice_3.in = %while_25_arg0_reg.out : i32
+        calyx.assign %arg_mem_2.addr0 = %std_slice_3.out : i1
+        calyx.assign %arg_mem_2.content_en = %true : i1
+        calyx.assign %arg_mem_2.write_en = %false : i1
+        calyx.group_done %arg_mem_2.done : i1
+      }
+      calyx.group @bb0_149 {
+        calyx.assign %std_addFN_2.left = %load_7_reg.out : i32
+        calyx.assign %std_addFN_2.right = %arg_mem_2.read_data : i32
+        calyx.assign %addf_2_reg.in = %std_addFN_2.out : i32
+        calyx.assign %addf_2_reg.write_en = %std_addFN_2.done : i1
+        %0 = comb.xor %std_addFN_2.done, %true : i1
+        calyx.assign %std_addFN_2.go = %0 ? %true : i1
+        calyx.assign %std_addFN_2.subOp = %false : i1
+        calyx.group_done %addf_2_reg.done : i1
+      }
+      calyx.group @bb0_150 {
+        calyx.assign %std_slice_2.in = %while_25_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_2.out : i1
+        calyx.assign %arg_mem_9.write_data = %addf_2_reg.out : i32
+        calyx.assign %arg_mem_9.write_en = %true : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.group_done %arg_mem_9.done : i1
+      }
+      calyx.group @assign_while_25_latch {
+        calyx.assign %while_25_arg0_reg.in = %std_add_70.out : i32
+        calyx.assign %while_25_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_70.left = %while_25_arg0_reg.out : i32
+        calyx.assign %std_add_70.right = %c1_i32 : i32
+        calyx.group_done %while_25_arg0_reg.done : i1
+      }
+      calyx.comb_group @bb0_151 {
+        calyx.assign %std_slt_29.left = %while_26_arg0_reg.out : i32
+        calyx.assign %std_slt_29.right = %c2_i32 : i32
+      }
+      calyx.group @bb0_153 {
+        calyx.assign %std_slice_1.in = %while_26_arg0_reg.out : i32
+        calyx.assign %arg_mem_9.addr0 = %std_slice_1.out : i1
+        calyx.assign %arg_mem_9.content_en = %true : i1
+        calyx.assign %arg_mem_9.write_en = %false : i1
+        calyx.assign %load_8_reg.in = %arg_mem_9.read_data : i32
+        calyx.assign %load_8_reg.write_en = %arg_mem_9.done : i1
+        calyx.group_done %load_8_reg.done : i1
+      }
+      calyx.group @bb0_154 {
+        calyx.assign %std_slice_0.in = %while_26_arg0_reg.out : i32
+        calyx.assign %arg_mem_1.addr0 = %std_slice_0.out : i1
+        calyx.assign %arg_mem_1.write_data = %load_8_reg.out : i32
+        calyx.assign %arg_mem_1.write_en = %true : i1
+        calyx.assign %arg_mem_1.content_en = %true : i1
+        calyx.group_done %arg_mem_1.done : i1
+      }
+      calyx.group @assign_while_26_latch {
+        calyx.assign %while_26_arg0_reg.in = %std_add_71.out : i32
+        calyx.assign %while_26_arg0_reg.write_en = %true : i1
+        calyx.assign %std_add_71.left = %while_26_arg0_reg.out : i32
+        calyx.assign %std_add_71.right = %c1_i32 : i32
+        calyx.group_done %while_26_arg0_reg.done : i1
+      }
+    }
+    calyx.control {
+      calyx.seq {
+        calyx.seq {
+          calyx.par {
+            calyx.enable @assign_while_2_init_0
+            calyx.enable @assign_while_2_init_1
+            calyx.enable @assign_while_2_init_2
+          }
+          calyx.while %std_slt_0.out with @bb0_0 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_1_init_0
+                calyx.enable @assign_while_1_init_1
+              }
+              calyx.while %std_slt_1.out with @bb0_2 {
+                calyx.seq {
+                  calyx.par {
+                    calyx.enable @assign_while_0_init_0
+                  }
+                  calyx.while %std_slt_2.out with @bb0_4 {
+                    calyx.seq {
+                      calyx.seq {
+                        calyx.enable @bb0_6
+                        calyx.enable @bb0_8
+                      }
+                      calyx.enable @assign_while_0_latch
+                    }
+                  }
+                  calyx.enable @assign_while_1_latch
+                }
+              }
+              calyx.enable @assign_while_2_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_8_init_0
+            calyx.enable @assign_while_8_init_1
+            calyx.enable @assign_while_8_init_2
+            calyx.enable @assign_while_8_init_3
+          }
+          calyx.while %std_slt_3.out with @bb0_12 {
+            calyx.seq {
+              calyx.seq {
+                calyx.enable @bb0_14
+                calyx.par {
+                  calyx.enable @assign_while_7_init_0
+                  calyx.enable @assign_while_7_init_1
+                }
+                calyx.while %std_slt_4.out with @bb0_15 {
+                  calyx.seq {
+                    calyx.seq {
+                      calyx.enable @bb0_17
+                      calyx.par {
+                        calyx.enable @assign_while_6_init_0
+                      }
+                      calyx.while %std_slt_5.out with @bb0_18 {
+                        calyx.seq {
+                          calyx.par {
+                            calyx.enable @assign_while_5_init_0
+                            calyx.enable @assign_while_5_init_1
+                            calyx.enable @assign_while_5_init_2
+                            calyx.enable @assign_while_5_init_3
+                          }
+                          calyx.while %std_slt_6.out with @bb0_21 {
+                            calyx.seq {
+                              calyx.seq {
+                                calyx.enable @bb0_23
+                                calyx.par {
+                                  calyx.enable @assign_while_4_init_0
+                                  calyx.enable @assign_while_4_init_1
+                                  calyx.enable @assign_while_4_init_2
+                                }
+                                calyx.while %std_slt_7.out with @bb0_24 {
+                                  calyx.seq {
+                                    calyx.par {
+                                      calyx.enable @assign_while_3_init_0
+                                    }
+                                    calyx.while %std_slt_8.out with @bb0_26 {
+                                      calyx.seq {
+                                        calyx.seq {
+                                          calyx.enable @bb0_30
+                                          calyx.enable @bb0_32
+                                          calyx.enable @bb0_33
+                                          calyx.enable @bb0_34
+                                          calyx.enable @bb0_35
+                                          calyx.enable @bb0_36
+                                        }
+                                        calyx.enable @assign_while_3_latch
+                                      }
+                                    }
+                                    calyx.enable @assign_while_4_latch
+                                  }
+                                }
+                              }
+                              calyx.enable @assign_while_5_latch
+                            }
+                          }
+                          calyx.enable @assign_while_6_latch
+                        }
+                      }
+                    }
+                    calyx.enable @assign_while_7_latch
+                  }
+                }
+              }
+              calyx.enable @assign_while_8_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_11_init_0
+            calyx.enable @assign_while_11_init_1
+            calyx.enable @assign_while_11_init_2
+          }
+          calyx.while %std_slt_9.out with @bb0_46 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_10_init_0
+                calyx.enable @assign_while_10_init_1
+              }
+              calyx.while %std_slt_10.out with @bb0_48 {
+                calyx.seq {
+                  calyx.par {
+                    calyx.enable @assign_while_9_init_0
+                  }
+                  calyx.while %std_slt_11.out with @bb0_50 {
+                    calyx.seq {
+                      calyx.seq {
+                        calyx.enable @bb0_53
+                        calyx.enable @bb0_54
+                        calyx.enable @bb0_56
+                      }
+                      calyx.enable @assign_while_9_latch
+                    }
+                  }
+                  calyx.enable @assign_while_10_latch
+                }
+              }
+              calyx.enable @assign_while_11_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_14_init_0
+            calyx.enable @assign_while_14_init_1
+            calyx.enable @assign_while_14_init_2
+          }
+          calyx.while %std_slt_12.out with @bb0_60 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_13_init_0
+                calyx.enable @assign_while_13_init_1
+              }
+              calyx.while %std_slt_13.out with @bb0_62 {
+                calyx.seq {
+                  calyx.par {
+                    calyx.enable @assign_while_12_init_0
+                  }
+                  calyx.while %std_slt_14.out with @bb0_64 {
+                    calyx.seq {
+                      calyx.enable @bb0_67
+                      calyx.enable @assign_while_12_latch
+                    }
+                  }
+                  calyx.enable @assign_while_13_latch
+                }
+              }
+              calyx.enable @assign_while_14_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_19_init_0
+            calyx.enable @assign_while_19_init_1
+            calyx.enable @assign_while_19_init_2
+            calyx.enable @assign_while_19_init_3
+          }
+          calyx.while %std_slt_15.out with @bb0_71 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_18_init_0
+                calyx.enable @assign_while_18_init_1
+                calyx.enable @assign_while_18_init_2
+              }
+              calyx.while %std_slt_16.out with @bb0_73 {
+                calyx.seq {
+                  calyx.seq {
+                    calyx.enable @bb0_76
+                    calyx.par {
+                      calyx.enable @assign_while_17_init_0
+                      calyx.enable @assign_while_17_init_1
+                    }
+                    calyx.while %std_slt_17.out with @bb0_77 {
+                      calyx.seq {
+                        calyx.par {
+                          calyx.enable @assign_while_16_init_0
+                          calyx.enable @assign_while_16_init_1
+                        }
+                        calyx.while %std_slt_18.out with @bb0_80 {
+                          calyx.seq {
+                            calyx.par {
+                              calyx.enable @assign_while_15_init_0
+                            }
+                            calyx.while %std_slt_19.out with @bb0_82 {
+                              calyx.seq {
+                                calyx.seq {
+                                  calyx.enable @bb0_86
+                                  calyx.enable @bb0_87
+                                  calyx.enable @bb0_88
+                                  calyx.enable @bb0_90
+                                  calyx.enable @bb0_92
+                                }
+                                calyx.enable @assign_while_15_latch
+                              }
+                            }
+                            calyx.enable @assign_while_16_latch
+                          }
+                        }
+                        calyx.enable @assign_while_17_latch
+                      }
+                    }
+                  }
+                  calyx.enable @assign_while_18_latch
+                }
+              }
+              calyx.enable @assign_while_19_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_21_init_0
+          }
+          calyx.while %std_slt_20.out with @bb0_100 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_20_init_0
+                calyx.enable @assign_while_20_init_1
+              }
+              calyx.while %std_slt_21.out with @bb0_103 {
+                calyx.seq {
+                  calyx.seq {
+                    calyx.enable @bb0_106
+                    calyx.enable @bb0_108
+                  }
+                  calyx.enable @assign_while_20_latch
+                }
+              }
+              calyx.enable @assign_while_21_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_22_init_0
+          }
+          calyx.while %std_slt_22.out with @bb0_110 {
+            calyx.seq {
+              calyx.enable @bb0_112
+              calyx.enable @assign_while_22_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_24_init_0
+          }
+          calyx.while %std_slt_23.out with @bb0_113 {
+            calyx.seq {
+              calyx.par {
+                calyx.enable @assign_while_23_init_0
+              }
+              calyx.while %std_slt_24.out with @bb0_115 {
+                calyx.seq {
+                  calyx.seq {
+                    calyx.enable @bb0_117
+                    calyx.enable @bb0_118
+                    calyx.enable @bb0_124
+                    calyx.enable @bb0_128
+                    calyx.enable @bb0_129
+                    calyx.enable @bb0_133
+                    calyx.enable @bb0_135
+                    calyx.enable @bb0_137
+                    calyx.enable @bb0_140
+                    calyx.enable @bb0_141
+                    calyx.enable @bb0_142
+                    calyx.enable @bb0_143
+                    calyx.enable @bb0_144
+                  }
+                  calyx.enable @assign_while_23_latch
+                }
+              }
+              calyx.enable @assign_while_24_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_25_init_0
+          }
+          calyx.while %std_slt_28.out with @bb0_145 {
+            calyx.seq {
+              calyx.seq {
+                calyx.enable @bb0_147
+                calyx.enable @bb0_148
+                calyx.enable @bb0_149
+                calyx.enable @bb0_150
+              }
+              calyx.enable @assign_while_25_latch
+            }
+          }
+          calyx.par {
+            calyx.enable @assign_while_26_init_0
+          }
+          calyx.while %std_slt_29.out with @bb0_151 {
+            calyx.seq {
+              calyx.seq {
+                calyx.enable @bb0_153
+                calyx.enable @bb0_154
+              }
+              calyx.enable @assign_while_26_latch
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
