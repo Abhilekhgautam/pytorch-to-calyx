@@ -1,5 +1,175 @@
-// Compiled by morty-0.9.0 / 2026-05-18 0:09:48.821906068 +05:45:00
+// Compiled by morty-0.9.0 / 2026-05-19 22:58:11.679596859 +05:45:00
 
+/**
+Implements a memory with sequential reads and writes.
+- Both reads and writes take one cycle to perform.
+- Attempting to read and write at the same time is an error.
+- The out signal is registered to the last value requested by the read_en signal.
+- The out signal is undefined once write_en is asserted.
+*/
+module seq_mem_d1 #(
+    parameter WIDTH = 32,
+    parameter SIZE = 16,
+    parameter IDX_SIZE = 4
+) (
+   // Common signals
+   input wire logic clk,
+   input wire logic reset,
+   input wire logic [IDX_SIZE-1:0] addr0,
+   input wire logic content_en,
+   output logic done,
+
+   // Read signal
+   output logic [ WIDTH-1:0] read_data,
+
+   // Write signals
+   input wire logic [ WIDTH-1:0] write_data,
+   input wire logic write_en
+);
+  // Internal memory
+  logic [WIDTH-1:0] mem[SIZE-1:0];
+
+  // Register for the read output
+  logic [WIDTH-1:0] read_out;
+  assign read_data = read_out;
+
+  // Read value from the memory
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      read_out <= '0;
+    end else if (content_en && !write_en) begin
+      /* verilator lint_off WIDTH */
+      read_out <= mem[addr0];
+    end else if (content_en && write_en) begin
+      // Explicitly clobber the read output when a write is performed
+      read_out <= 'x;
+    end else begin
+      read_out <= read_out;
+    end
+  end
+
+  // Propagate the done signal
+  always_ff @(posedge clk) begin
+    if (reset) begin
+      done <= '0;
+    end else if (content_en) begin
+      done <= '1;
+    end else begin
+      done <= '0;
+    end
+  end
+
+  // Write value to the memory
+  always_ff @(posedge clk) begin
+    if (!reset && content_en && write_en)
+      mem[addr0] <= write_data;
+  end
+
+  // Check for out of bounds access
+  
+endmodule
+
+module seq_mem_d2 #(
+    parameter WIDTH = 32,
+    parameter D0_SIZE = 16,
+    parameter D1_SIZE = 16,
+    parameter D0_IDX_SIZE = 4,
+    parameter D1_IDX_SIZE = 4
+) (
+   // Common signals
+   input wire logic clk,
+   input wire logic reset,
+   input wire logic [D0_IDX_SIZE-1:0] addr0,
+   input wire logic [D1_IDX_SIZE-1:0] addr1,
+   input wire logic content_en,
+   output logic done,
+
+   // Read signal
+   output logic [WIDTH-1:0] read_data,
+
+   // Write signals
+   input wire logic write_en,
+   input wire logic [ WIDTH-1:0] write_data
+);
+  wire [D0_IDX_SIZE+D1_IDX_SIZE-1:0] addr;
+  assign addr = addr0 * D1_SIZE + addr1;
+
+  seq_mem_d1 #(.WIDTH(WIDTH), .SIZE(D0_SIZE * D1_SIZE), .IDX_SIZE(D0_IDX_SIZE+D1_IDX_SIZE)) mem
+     (.clk(clk), .reset(reset), .addr0(addr),
+    .content_en(content_en), .read_data(read_data), .write_data(write_data), .write_en(write_en),
+    .done(done));
+endmodule
+
+module seq_mem_d3 #(
+    parameter WIDTH = 32,
+    parameter D0_SIZE = 16,
+    parameter D1_SIZE = 16,
+    parameter D2_SIZE = 16,
+    parameter D0_IDX_SIZE = 4,
+    parameter D1_IDX_SIZE = 4,
+    parameter D2_IDX_SIZE = 4
+) (
+   // Common signals
+   input wire logic clk,
+   input wire logic reset,
+   input wire logic [D0_IDX_SIZE-1:0] addr0,
+   input wire logic [D1_IDX_SIZE-1:0] addr1,
+   input wire logic [D2_IDX_SIZE-1:0] addr2,
+   input wire logic content_en,
+   output logic done,
+
+   // Read signal
+   output logic [WIDTH-1:0] read_data,
+
+   // Write signals
+   input wire logic write_en,
+   input wire logic [ WIDTH-1:0] write_data
+);
+  wire [D0_IDX_SIZE+D1_IDX_SIZE+D2_IDX_SIZE-1:0] addr;
+  assign addr = addr0 * (D1_SIZE * D2_SIZE) + addr1 * (D2_SIZE) + addr2;
+
+  seq_mem_d1 #(.WIDTH(WIDTH), .SIZE(D0_SIZE * D1_SIZE * D2_SIZE), .IDX_SIZE(D0_IDX_SIZE+D1_IDX_SIZE+D2_IDX_SIZE)) mem
+     (.clk(clk), .reset(reset), .addr0(addr),
+    .content_en(content_en), .read_data(read_data), .write_data(write_data), .write_en(write_en),
+    .done(done));
+endmodule
+
+module seq_mem_d4 #(
+    parameter WIDTH = 32,
+    parameter D0_SIZE = 16,
+    parameter D1_SIZE = 16,
+    parameter D2_SIZE = 16,
+    parameter D3_SIZE = 16,
+    parameter D0_IDX_SIZE = 4,
+    parameter D1_IDX_SIZE = 4,
+    parameter D2_IDX_SIZE = 4,
+    parameter D3_IDX_SIZE = 4
+) (
+   // Common signals
+   input wire logic clk,
+   input wire logic reset,
+   input wire logic [D0_IDX_SIZE-1:0] addr0,
+   input wire logic [D1_IDX_SIZE-1:0] addr1,
+   input wire logic [D2_IDX_SIZE-1:0] addr2,
+   input wire logic [D3_IDX_SIZE-1:0] addr3,
+   input wire logic content_en,
+   output logic done,
+
+   // Read signal
+   output logic [WIDTH-1:0] read_data,
+
+   // Write signals
+   input wire logic write_en,
+   input wire logic [ WIDTH-1:0] write_data
+);
+  wire [D0_IDX_SIZE+D1_IDX_SIZE+D2_IDX_SIZE+D3_IDX_SIZE-1:0] addr;
+  assign addr = addr0 * (D1_SIZE * D2_SIZE * D3_SIZE) + addr1 * (D2_SIZE * D3_SIZE) + addr2 * (D3_SIZE) + addr3;
+
+  seq_mem_d1 #(.WIDTH(WIDTH), .SIZE(D0_SIZE * D1_SIZE * D2_SIZE * D3_SIZE), .IDX_SIZE(D0_IDX_SIZE+D1_IDX_SIZE+D2_IDX_SIZE+D3_IDX_SIZE)) mem
+     (.clk(clk), .reset(reset), .addr0(addr),
+    .content_en(content_en), .read_data(read_data), .write_data(write_data), .write_en(write_en),
+    .done(done));
+endmodule
 `define __MULFN_V__
 
 
@@ -1408,13 +1578,133 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+
+/*============================================================================
+
+This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
+Point Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define round_near_even   3'b000
+`define round_minMag      3'b001
+`define round_min         3'b010
+`define round_max         3'b011
+`define round_near_maxMag 3'b100
+`define round_odd         3'b110
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define floatControlWidth 1
+`define flControl_tininessBeforeRounding 1'b0
+`define flControl_tininessAfterRounding  1'b1
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define flRoundOpt_sigMSBitAlwaysZero  1
+`define flRoundOpt_subnormsAlwaysExact 2
+`define flRoundOpt_neverUnderflows     4
+`define flRoundOpt_neverOverflows      8
+
+
+
+/*============================================================================
+
+This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
+Point Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define flControl_default `flControl_tininessAfterRounding
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+//`define HardFloat_propagateNaNPayloads
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define HardFloat_signDefaultNaN 0
+`define HardFloat_fractDefaultNaN(sigWidth) {1'b1, {((sigWidth) - 2){1'b0}}}
+
+
+
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
 
 module
-    recFNToFN#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(expWidth + sigWidth):0] in,
-        output [(expWidth + sigWidth - 1):0] out
+    addRecFNToRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(1 - 1):0] control,
+        input subOp,
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        input [2:0] roundingMode,
+        output invalidExc,
+        output out_isNaN,
+        output out_isInf,
+        output out_isZero,
+        output out_sign,
+        output signed [(expWidth + 1):0] out_sExp,
+        output [(sigWidth + 2):0] out_sig
     );
 
 /*============================================================================
@@ -1469,25 +1759,481 @@ endfunction
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    localparam [expWidth:0] minNormExp = (1<<(expWidth - 1)) + 2;
-    localparam normDistWidth = clog2(sigWidth);
+    localparam alignDistWidth = clog2(sigWidth);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    wire isNaN, isInf, isZero, sign;
-    wire signed [(expWidth + 1):0] sExp;
-    wire [sigWidth:0] sig;
+    wire isNaNA, isInfA, isZeroA, signA;
+    wire signed [(expWidth + 1):0] sExpA;
+    wire [sigWidth:0] sigA;
     recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN(in, isNaN, isInf, isZero, sign, sExp, sig);
-    wire isSubnormal = (sExp < minNormExp);
+        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
+    wire isSigNaNA;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
+    wire isNaNB, isInfB, isZeroB, signB;
+    wire signed [(expWidth + 1):0] sExpB;
+    wire [sigWidth:0] sigB;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
+    wire effSignB = subOp ? !signB : signB;
+    wire isSigNaNB;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    wire [(normDistWidth - 1):0] denormShiftDist = minNormExp - 1 - sExp;
-    wire [(expWidth - 1):0] expOut =
-        (isSubnormal ? 0 : sExp - minNormExp + 1)
-            | (isNaN || isInf ? {expWidth{1'b1}} : 0);
-    wire [(sigWidth - 2):0] fractOut =
-        isSubnormal ? (sig>>1)>>denormShiftDist : isInf ? 0 : sig;
-    assign out = {sign, expOut, fractOut};
+    wire eqSigns = (signA == effSignB);
+    wire notEqSigns_signZero = (roundingMode == 3'b010) ? 1 : 0;
+    wire signed [(expWidth + 1):0] sDiffExps = sExpA - sExpB;
+    wire [(alignDistWidth - 1):0] modNatAlignDist =
+        (sDiffExps < 0) ? sExpB - sExpA : sDiffExps;
+    wire isMaxAlign =
+        (sDiffExps>>>alignDistWidth != 0)
+            && ((sDiffExps>>>alignDistWidth != -1)
+                    || (sDiffExps[(alignDistWidth - 1):0] == 0));
+    wire [(alignDistWidth - 1):0] alignDist =
+        isMaxAlign ? (1<<alignDistWidth) - 1 : modNatAlignDist;
+    wire closeSubMags = !eqSigns && !isMaxAlign && (modNatAlignDist <= 1);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire signed [(sigWidth + 2):0] close_alignedSigA =
+          ((0 <= sDiffExps) &&  sDiffExps[0] ? sigA<<2 : 0)
+        | ((0 <= sDiffExps) && !sDiffExps[0] ? sigA<<1 : 0)
+        | ((sDiffExps < 0)                   ? sigA    : 0);
+    wire signed [(sigWidth + 2):0] close_sSigSum =
+        close_alignedSigA - (sigB<<1);
+    wire [(sigWidth + 1):0] close_sigSum =
+        (close_sSigSum < 0) ? -close_sSigSum : close_sSigSum;
+    wire [(sigWidth + 1 + (sigWidth & 1)):0] close_adjustedSigSum =
+        close_sigSum<<(sigWidth & 1);
+    wire [(sigWidth + 1)/2:0] close_reduced2SigSum;
+    compressBy2#(sigWidth + 2 + (sigWidth & 1))
+        compressBy2_close_sigSum(close_adjustedSigSum, close_reduced2SigSum);
+    wire [(alignDistWidth - 1):0] close_normDistReduced2;
+    countLeadingZeros#((sigWidth + 3)/2, alignDistWidth)
+        countLeadingZeros_close(close_reduced2SigSum, close_normDistReduced2);
+    wire [(alignDistWidth - 1):0] close_nearNormDist =
+        close_normDistReduced2<<1;
+    wire [(sigWidth + 2):0] close_sigOut =
+        (close_sigSum<<close_nearNormDist)<<1;
+    wire close_totalCancellation =
+        !(|close_sigOut[(sigWidth + 2):(sigWidth + 1)]);
+    wire close_notTotalCancellation_signOut = signA ^ (close_sSigSum < 0);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire far_signOut = (sDiffExps < 0) ? effSignB : signA;
+    wire [(sigWidth - 1):0] far_sigLarger  = (sDiffExps < 0) ? sigB : sigA;
+    wire [(sigWidth - 1):0] far_sigSmaller = (sDiffExps < 0) ? sigA : sigB;
+    wire [(sigWidth + 4):0] far_mainAlignedSigSmaller =
+        {far_sigSmaller, 5'b0}>>alignDist;
+    wire [(sigWidth + 1)/4:0] far_reduced4SigSmaller;
+    compressBy4#(sigWidth + 2)
+        compressBy4_far_sigSmaller(
+            {far_sigSmaller, 2'b00}, far_reduced4SigSmaller);
+    wire [(sigWidth + 1)/4:0] far_roundExtraMask;
+    lowMaskHiLo#(alignDistWidth - 2, (sigWidth + 5)/4, 0)
+        lowMask_far_roundExtraMask(
+            alignDist[(alignDistWidth - 1):2], far_roundExtraMask);
+    wire [(sigWidth + 2):0] far_alignedSigSmaller =
+        {far_mainAlignedSigSmaller>>3,
+         (|far_mainAlignedSigSmaller[2:0])
+             || (|(far_reduced4SigSmaller & far_roundExtraMask))};
+    wire far_subMags = !eqSigns;
+    wire [(sigWidth + 3):0] far_negAlignedSigSmaller =
+        far_subMags ? {1'b1, ~far_alignedSigSmaller}
+            : {1'b0, far_alignedSigSmaller};
+    wire [(sigWidth + 3):0] far_sigSum =
+        (far_sigLarger<<3) + far_negAlignedSigSmaller + far_subMags;
+    wire [(sigWidth + 2):0] far_sigOut =
+        far_subMags ? far_sigSum : far_sigSum>>1 | far_sigSum[0];
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire notSigNaN_invalidExc = isInfA && isInfB && !eqSigns;
+    wire notNaN_isInfOut = isInfA || isInfB;
+    wire addZeros = isZeroA && isZeroB;
+    wire notNaN_specialCase = notNaN_isInfOut || addZeros;
+    wire notNaN_isZeroOut =
+        addZeros
+            || (!notNaN_isInfOut && closeSubMags && close_totalCancellation);
+    wire notNaN_signOut =
+           (eqSigns                      && signA              )
+        || (isInfA                       && signA              )
+        || (isInfB                       && effSignB           )
+        || (notNaN_isZeroOut && !eqSigns && notEqSigns_signZero)
+        || (!notNaN_specialCase && closeSubMags && !close_totalCancellation
+                                        && close_notTotalCancellation_signOut)
+        || (!notNaN_specialCase && !closeSubMags && far_signOut);
+    wire signed [(expWidth + 1):0] common_sExpOut =
+        (closeSubMags || (sDiffExps < 0) ? sExpB : sExpA)
+            - (closeSubMags ? close_nearNormDist : far_subMags);
+    wire [(sigWidth + 2):0] common_sigOut =
+        closeSubMags ? close_sigOut : far_sigOut;
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
+    assign out_isInf = notNaN_isInfOut;
+    assign out_isZero = notNaN_isZeroOut;
+    assign out_sExp = common_sExpOut;
+assign out_isNaN = isNaNA || isNaNB;
+    assign out_sign = notNaN_signOut;
+    assign out_sig = common_sigOut;
+
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    addRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(1 - 1):0] control,
+        input subOp,
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        input [2:0] roundingMode,
+        output [(expWidth + sigWidth):0] out,
+        output [4:0] exceptionFlags
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire invalidExc, out_isNaN, out_isInf, out_isZero, out_sign;
+    wire signed [(expWidth + 1):0] out_sExp;
+    wire [(sigWidth + 2):0] out_sig;
+    addRecFNToRaw#(expWidth, sigWidth)
+        addRecFNToRaw(
+            control,
+            subOp,
+            a,
+            b,
+            roundingMode,
+            invalidExc,
+            out_isNaN,
+            out_isInf,
+            out_isZero,
+            out_sign,
+            out_sExp,
+            out_sig
+        );
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    roundRawFNToRecFN#(expWidth, sigWidth, 2)
+        roundRawOut(
+            control,
+            invalidExc,
+            1'b0,
+            out_isNaN,
+            out_isInf,
+            out_isZero,
+            out_sign,
+            out_sExp,
+            out_sig,
+            roundingMode,
+            out,
+            exceptionFlags
+        );
+
+endmodule
+
+
+/*============================================================================
+
+This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
+Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+
+/*============================================================================
+
+This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
+Point Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define round_near_even   3'b000
+`define round_minMag      3'b001
+`define round_min         3'b010
+`define round_max         3'b011
+`define round_near_maxMag 3'b100
+`define round_odd         3'b110
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define floatControlWidth 1
+`define flControl_tininessBeforeRounding 1'b0
+`define flControl_tininessAfterRounding  1'b1
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define flRoundOpt_sigMSBitAlwaysZero  1
+`define flRoundOpt_subnormsAlwaysExact 2
+`define flRoundOpt_neverUnderflows     4
+`define flRoundOpt_neverOverflows      8
+
+
+
+/*============================================================================
+
+This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
+Point Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define flControl_default `flControl_tininessAfterRounding
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+//`define HardFloat_propagateNaNPayloads
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+`define HardFloat_signDefaultNaN 0
+`define HardFloat_fractDefaultNaN(sigWidth) {1'b1, {((sigWidth) - 2){1'b0}}}
+
+
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    mulRecFNToFullRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(1 - 1):0] control,
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        output invalidExc,
+        output out_isNaN,
+        output out_isInf,
+        output out_isZero,
+        output out_sign,
+        output signed [(expWidth + 1):0] out_sExp,
+        output [(sigWidth*2 - 1):0] out_sig
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire isNaNA, isInfA, isZeroA, signA;
+    wire signed [(expWidth + 1):0] sExpA;
+    wire [sigWidth:0] sigA;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
+    wire isSigNaNA;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
+    wire isNaNB, isInfB, isZeroB, signB;
+    wire signed [(expWidth + 1):0] sExpB;
+    wire [sigWidth:0] sigB;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
+    wire isSigNaNB;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire notSigNaN_invalidExc = (isInfA && isZeroB) || (isZeroA && isInfB);
+    wire notNaN_isInfOut = isInfA || isInfB;
+    wire notNaN_isZeroOut = isZeroA || isZeroB;
+    wire notNaN_signOut = signA ^ signB;
+    wire signed [(expWidth + 1):0] common_sExpOut =
+        sExpA + sExpB - (1<<expWidth);
+    wire [(sigWidth*2 - 1):0] common_sigOut = sigA * sigB;
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
+    assign out_isInf = notNaN_isInfOut;
+    assign out_isZero = notNaN_isZeroOut;
+    assign out_sExp = common_sExpOut;
+assign out_isNaN = isNaNA || isNaNB;
+    assign out_sign = notNaN_signOut;
+    assign out_sig = common_sigOut;
+
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    mulRecFNToRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(1 - 1):0] control,
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        output invalidExc,
+        output out_isNaN,
+        output out_isInf,
+        output out_isZero,
+        output out_sign,
+        output signed [(expWidth + 1):0] out_sExp,
+        output [(sigWidth + 2):0] out_sig
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire isNaNA, isInfA, isZeroA, signA;
+    wire signed [(expWidth + 1):0] sExpA;
+    wire [sigWidth:0] sigA;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
+    wire isSigNaNA;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
+    wire isNaNB, isInfB, isZeroB, signB;
+    wire signed [(expWidth + 1):0] sExpB;
+    wire [sigWidth:0] sigB;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
+    wire isSigNaNB;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire notSigNaN_invalidExc = (isInfA && isZeroB) || (isZeroA && isInfB);
+    wire notNaN_isInfOut = isInfA || isInfB;
+    wire notNaN_isZeroOut = isZeroA || isZeroB;
+    wire notNaN_signOut = signA ^ signB;
+    wire signed [(expWidth + 1):0] common_sExpOut =
+        sExpA + sExpB - (1<<expWidth);
+    wire [(sigWidth*2 - 1):0] sigProd = sigA * sigB;
+    wire [(sigWidth + 2):0] common_sigOut =
+        {sigProd[(sigWidth*2 - 1):(sigWidth - 2)], |sigProd[(sigWidth - 3):0]};
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
+    assign out_isInf = notNaN_isInfOut;
+    assign out_isZero = notNaN_isZeroOut;
+    assign out_sExp = common_sExpOut;
+assign out_isNaN = isNaNA || isNaNB;
+    assign out_sign = notNaN_signOut;
+    assign out_sig = common_sigOut;
+
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    mulRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(1 - 1):0] control,
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        input [2:0] roundingMode,
+        output [(expWidth + sigWidth):0] out,
+        output [4:0] exceptionFlags
+    );
+
+    wire invalidExc, out_isNaN, out_isInf, out_isZero, out_sign;
+    wire signed [(expWidth + 1):0] out_sExp;
+    wire [(sigWidth + 2):0] out_sig;
+    mulRecFNToRaw#(expWidth, sigWidth)
+        mulRecFNToRaw(
+            control,
+            a,
+            b,
+            invalidExc,
+            out_isNaN,
+            out_isInf,
+            out_isZero,
+            out_sign,
+            out_sExp,
+            out_sig
+        );
+    roundRawFNToRecFN#(expWidth, sigWidth, 0)
+        roundRawOut(
+            control,
+            invalidExc,
+            1'b0,
+            out_isNaN,
+            out_isInf,
+            out_isZero,
+            out_sign,
+            out_sExp,
+            out_sig,
+            roundingMode,
+            out,
+            exceptionFlags
+        );
 
 endmodule
 
@@ -1531,13 +2277,136 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 
 module
-    isSigNaNRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(expWidth + sigWidth):0] in, output isSigNaN
+    reverse#(parameter width = 1) (
+        input [(width - 1):0] in, output [(width - 1):0] out
     );
 
-    wire isNaN =
-        (in[(expWidth + sigWidth - 1):(expWidth + sigWidth - 3)] == 'b111);
-    assign isSigNaN = isNaN && !in[sigWidth - 2];
+    genvar ix;
+    generate
+        for (ix = 0; ix < width; ix = ix + 1) begin :Bit
+            assign out[ix] = in[width - 1 - ix];
+        end
+    endgenerate
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    lowMaskHiLo#(
+        parameter inWidth = 1,
+        parameter topBound = 1,
+        parameter bottomBound = 0
+    ) (
+        input [(inWidth - 1):0] in,
+        output [(topBound - bottomBound - 1):0] out
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    localparam numInVals = 1<<inWidth;
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire signed [numInVals:0] c;
+    assign c[numInVals] = 1;
+    assign c[(numInVals - 1):0] = 0;
+    wire [(topBound - bottomBound - 1):0] reverseOut =
+        (c>>>in)>>(numInVals - topBound);
+    reverse#(topBound - bottomBound) reverse(reverseOut, out);
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    lowMaskLoHi#(
+        parameter inWidth = 1,
+        parameter topBound = 0,
+        parameter bottomBound = 1
+    ) (
+        input [(inWidth - 1):0] in,
+        output [(bottomBound - topBound - 1):0] out
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    localparam numInVals = 1<<inWidth;
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire signed [numInVals:0] c;
+    assign c[numInVals] = 1;
+    assign c[(numInVals - 1):0] = 0;
+    wire [(bottomBound - topBound - 1):0] reverseOut =
+        (c>>>~in)>>(topBound + 1);
+    reverse#(bottomBound - topBound) reverse(reverseOut, out);
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    countLeadingZeros#(parameter inWidth = 1, parameter countWidth = 1) (
+        input [(inWidth - 1):0] in, output [(countWidth - 1):0] count
+    );
+
+    wire [(inWidth - 1):0] reverseIn;
+    reverse#(inWidth) reverse_in(in, reverseIn);
+    wire [inWidth:0] oneLeastReverseIn =
+        {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
+    genvar ix;
+    generate
+        for (ix = 0; ix <= inWidth; ix = ix + 1) begin :Bit
+            wire [(countWidth - 1):0] countSoFar;
+            if (ix == 0) begin
+                assign countSoFar = 0;
+            end else begin
+                assign countSoFar =
+                    Bit[ix - 1].countSoFar | (oneLeastReverseIn[ix] ? ix : 0);
+                if (ix == inWidth) assign count = countSoFar;
+            end
+        end
+    endgenerate
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    compressBy2#(parameter inWidth = 1) (
+        input [(inWidth - 1):0] in, output [((inWidth - 1)/2):0] out
+    );
+
+    localparam maxBitNumReduced = (inWidth - 1)/2;
+    genvar ix;
+    generate
+        for (ix = 0; ix < maxBitNumReduced; ix = ix + 1) begin :Bit
+            assign out[ix] = |in[(ix*2 + 1):ix*2];
+        end
+    endgenerate
+    assign out[maxBitNumReduced] = |in[(inWidth - 1):maxBitNumReduced*2];
+
+endmodule
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    compressBy4#(parameter inWidth = 1) (
+        input [(inWidth - 1):0] in, output [(inWidth - 1)/4:0] out
+    );
+
+    localparam maxBitNumReduced = (inWidth - 1)/4;
+    genvar ix;
+    generate
+        for (ix = 0; ix < maxBitNumReduced; ix = ix + 1) begin :Bit
+            assign out[ix] = |in[(ix*4 + 3):ix*4];
+        end
+    endgenerate
+    assign out[maxBitNumReduced] = |in[(inWidth - 1):maxBitNumReduced*4];
 
 endmodule
 
@@ -2033,663 +2902,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *----------------------------------------------------------------------------*/
 
 module
-    compareRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        input signaling,
-        output lt,
-        output eq,
-        output gt,
-        output unordered,
-        output [4:0] exceptionFlags
-    );
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire isNaNA, isInfA, isZeroA, signA;
-    wire signed [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
-    wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
-    wire isNaNB, isInfB, isZeroB, signB;
-    wire signed [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
-    wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire ordered = !isNaNA && !isNaNB;
-    wire bothInfs  = isInfA  && isInfB;
-    wire bothZeros = isZeroA && isZeroB;
-    wire eqExps = (sExpA == sExpB);
-    wire common_ltMags = (sExpA < sExpB) || (eqExps && (sigA < sigB));
-    wire common_eqMags = eqExps && (sigA == sigB);
-    wire ordered_lt =
-        !bothZeros
-            && ((signA && !signB)
-                    || (!bothInfs
-                            && ((signA && !common_ltMags && !common_eqMags)
-                                    || (!signB && common_ltMags))));
-    wire ordered_eq =
-        bothZeros || ((signA == signB) && (bothInfs || common_eqMags));
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire invalid = isSigNaNA || isSigNaNB || (signaling && !ordered);
-    assign lt = ordered && ordered_lt;
-    assign eq = ordered && ordered_eq;
-    assign gt = ordered && !ordered_lt && !ordered_eq;
-    assign unordered = !ordered;
-    assign exceptionFlags = {invalid, 4'b0};
-
-endmodule
-
-
-/*============================================================================
-
-This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
-Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-
-/*============================================================================
-
-This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
-Point Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define round_near_even   3'b000
-`define round_minMag      3'b001
-`define round_min         3'b010
-`define round_max         3'b011
-`define round_near_maxMag 3'b100
-`define round_odd         3'b110
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define floatControlWidth 1
-`define flControl_tininessBeforeRounding 1'b0
-`define flControl_tininessAfterRounding  1'b1
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define flRoundOpt_sigMSBitAlwaysZero  1
-`define flRoundOpt_subnormsAlwaysExact 2
-`define flRoundOpt_neverUnderflows     4
-`define flRoundOpt_neverOverflows      8
-
-
-
-/*============================================================================
-
-This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
-Point Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define flControl_default `flControl_tininessAfterRounding
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-//`define HardFloat_propagateNaNPayloads
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define HardFloat_signDefaultNaN 0
-`define HardFloat_fractDefaultNaN(sigWidth) {1'b1, {((sigWidth) - 2){1'b0}}}
-
-
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    addRecFNToRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(1 - 1):0] control,
-        input subOp,
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        input [2:0] roundingMode,
-        output invalidExc,
-        output out_isNaN,
-        output out_isInf,
-        output out_isZero,
-        output out_sign,
-        output signed [(expWidth + 1):0] out_sExp,
-        output [(sigWidth + 2):0] out_sig
-    );
-
-/*============================================================================
-
-This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
-Point Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-function integer clog2;
-    input integer a;
-
-    begin
-        a = a - 1;
-        for (clog2 = 0; a > 0; clog2 = clog2 + 1) a = a>>1;
-    end
-
-endfunction
-
-
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    localparam alignDistWidth = clog2(sigWidth);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire isNaNA, isInfA, isZeroA, signA;
-    wire signed [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
-    wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
-    wire isNaNB, isInfB, isZeroB, signB;
-    wire signed [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
-    wire effSignB = subOp ? !signB : signB;
-    wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire eqSigns = (signA == effSignB);
-    wire notEqSigns_signZero = (roundingMode == 3'b010) ? 1 : 0;
-    wire signed [(expWidth + 1):0] sDiffExps = sExpA - sExpB;
-    wire [(alignDistWidth - 1):0] modNatAlignDist =
-        (sDiffExps < 0) ? sExpB - sExpA : sDiffExps;
-    wire isMaxAlign =
-        (sDiffExps>>>alignDistWidth != 0)
-            && ((sDiffExps>>>alignDistWidth != -1)
-                    || (sDiffExps[(alignDistWidth - 1):0] == 0));
-    wire [(alignDistWidth - 1):0] alignDist =
-        isMaxAlign ? (1<<alignDistWidth) - 1 : modNatAlignDist;
-    wire closeSubMags = !eqSigns && !isMaxAlign && (modNatAlignDist <= 1);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire signed [(sigWidth + 2):0] close_alignedSigA =
-          ((0 <= sDiffExps) &&  sDiffExps[0] ? sigA<<2 : 0)
-        | ((0 <= sDiffExps) && !sDiffExps[0] ? sigA<<1 : 0)
-        | ((sDiffExps < 0)                   ? sigA    : 0);
-    wire signed [(sigWidth + 2):0] close_sSigSum =
-        close_alignedSigA - (sigB<<1);
-    wire [(sigWidth + 1):0] close_sigSum =
-        (close_sSigSum < 0) ? -close_sSigSum : close_sSigSum;
-    wire [(sigWidth + 1 + (sigWidth & 1)):0] close_adjustedSigSum =
-        close_sigSum<<(sigWidth & 1);
-    wire [(sigWidth + 1)/2:0] close_reduced2SigSum;
-    compressBy2#(sigWidth + 2 + (sigWidth & 1))
-        compressBy2_close_sigSum(close_adjustedSigSum, close_reduced2SigSum);
-    wire [(alignDistWidth - 1):0] close_normDistReduced2;
-    countLeadingZeros#((sigWidth + 3)/2, alignDistWidth)
-        countLeadingZeros_close(close_reduced2SigSum, close_normDistReduced2);
-    wire [(alignDistWidth - 1):0] close_nearNormDist =
-        close_normDistReduced2<<1;
-    wire [(sigWidth + 2):0] close_sigOut =
-        (close_sigSum<<close_nearNormDist)<<1;
-    wire close_totalCancellation =
-        !(|close_sigOut[(sigWidth + 2):(sigWidth + 1)]);
-    wire close_notTotalCancellation_signOut = signA ^ (close_sSigSum < 0);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire far_signOut = (sDiffExps < 0) ? effSignB : signA;
-    wire [(sigWidth - 1):0] far_sigLarger  = (sDiffExps < 0) ? sigB : sigA;
-    wire [(sigWidth - 1):0] far_sigSmaller = (sDiffExps < 0) ? sigA : sigB;
-    wire [(sigWidth + 4):0] far_mainAlignedSigSmaller =
-        {far_sigSmaller, 5'b0}>>alignDist;
-    wire [(sigWidth + 1)/4:0] far_reduced4SigSmaller;
-    compressBy4#(sigWidth + 2)
-        compressBy4_far_sigSmaller(
-            {far_sigSmaller, 2'b00}, far_reduced4SigSmaller);
-    wire [(sigWidth + 1)/4:0] far_roundExtraMask;
-    lowMaskHiLo#(alignDistWidth - 2, (sigWidth + 5)/4, 0)
-        lowMask_far_roundExtraMask(
-            alignDist[(alignDistWidth - 1):2], far_roundExtraMask);
-    wire [(sigWidth + 2):0] far_alignedSigSmaller =
-        {far_mainAlignedSigSmaller>>3,
-         (|far_mainAlignedSigSmaller[2:0])
-             || (|(far_reduced4SigSmaller & far_roundExtraMask))};
-    wire far_subMags = !eqSigns;
-    wire [(sigWidth + 3):0] far_negAlignedSigSmaller =
-        far_subMags ? {1'b1, ~far_alignedSigSmaller}
-            : {1'b0, far_alignedSigSmaller};
-    wire [(sigWidth + 3):0] far_sigSum =
-        (far_sigLarger<<3) + far_negAlignedSigSmaller + far_subMags;
-    wire [(sigWidth + 2):0] far_sigOut =
-        far_subMags ? far_sigSum : far_sigSum>>1 | far_sigSum[0];
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire notSigNaN_invalidExc = isInfA && isInfB && !eqSigns;
-    wire notNaN_isInfOut = isInfA || isInfB;
-    wire addZeros = isZeroA && isZeroB;
-    wire notNaN_specialCase = notNaN_isInfOut || addZeros;
-    wire notNaN_isZeroOut =
-        addZeros
-            || (!notNaN_isInfOut && closeSubMags && close_totalCancellation);
-    wire notNaN_signOut =
-           (eqSigns                      && signA              )
-        || (isInfA                       && signA              )
-        || (isInfB                       && effSignB           )
-        || (notNaN_isZeroOut && !eqSigns && notEqSigns_signZero)
-        || (!notNaN_specialCase && closeSubMags && !close_totalCancellation
-                                        && close_notTotalCancellation_signOut)
-        || (!notNaN_specialCase && !closeSubMags && far_signOut);
-    wire signed [(expWidth + 1):0] common_sExpOut =
-        (closeSubMags || (sDiffExps < 0) ? sExpB : sExpA)
-            - (closeSubMags ? close_nearNormDist : far_subMags);
-    wire [(sigWidth + 2):0] common_sigOut =
-        closeSubMags ? close_sigOut : far_sigOut;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
-    assign out_isInf = notNaN_isInfOut;
-    assign out_isZero = notNaN_isZeroOut;
-    assign out_sExp = common_sExpOut;
-assign out_isNaN = isNaNA || isNaNB;
-    assign out_sign = notNaN_signOut;
-    assign out_sig = common_sigOut;
-
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    addRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(1 - 1):0] control,
-        input subOp,
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        input [2:0] roundingMode,
-        output [(expWidth + sigWidth):0] out,
-        output [4:0] exceptionFlags
-    );
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire invalidExc, out_isNaN, out_isInf, out_isZero, out_sign;
-    wire signed [(expWidth + 1):0] out_sExp;
-    wire [(sigWidth + 2):0] out_sig;
-    addRecFNToRaw#(expWidth, sigWidth)
-        addRecFNToRaw(
-            control,
-            subOp,
-            a,
-            b,
-            roundingMode,
-            invalidExc,
-            out_isNaN,
-            out_isInf,
-            out_isZero,
-            out_sign,
-            out_sExp,
-            out_sig
-        );
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    roundRawFNToRecFN#(expWidth, sigWidth, 2)
-        roundRawOut(
-            control,
-            invalidExc,
-            1'b0,
-            out_isNaN,
-            out_isInf,
-            out_isZero,
-            out_sign,
-            out_sExp,
-            out_sig,
-            roundingMode,
-            out,
-            exceptionFlags
-        );
-
-endmodule
-
-
-/*============================================================================
-
-This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
-Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    reverse#(parameter width = 1) (
-        input [(width - 1):0] in, output [(width - 1):0] out
-    );
-
-    genvar ix;
-    generate
-        for (ix = 0; ix < width; ix = ix + 1) begin :Bit
-            assign out[ix] = in[width - 1 - ix];
-        end
-    endgenerate
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    lowMaskHiLo#(
-        parameter inWidth = 1,
-        parameter topBound = 1,
-        parameter bottomBound = 0
-    ) (
-        input [(inWidth - 1):0] in,
-        output [(topBound - bottomBound - 1):0] out
-    );
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    localparam numInVals = 1<<inWidth;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire signed [numInVals:0] c;
-    assign c[numInVals] = 1;
-    assign c[(numInVals - 1):0] = 0;
-    wire [(topBound - bottomBound - 1):0] reverseOut =
-        (c>>>in)>>(numInVals - topBound);
-    reverse#(topBound - bottomBound) reverse(reverseOut, out);
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    lowMaskLoHi#(
-        parameter inWidth = 1,
-        parameter topBound = 0,
-        parameter bottomBound = 1
-    ) (
-        input [(inWidth - 1):0] in,
-        output [(bottomBound - topBound - 1):0] out
-    );
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    localparam numInVals = 1<<inWidth;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire signed [numInVals:0] c;
-    assign c[numInVals] = 1;
-    assign c[(numInVals - 1):0] = 0;
-    wire [(bottomBound - topBound - 1):0] reverseOut =
-        (c>>>~in)>>(topBound + 1);
-    reverse#(bottomBound - topBound) reverse(reverseOut, out);
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    countLeadingZeros#(parameter inWidth = 1, parameter countWidth = 1) (
-        input [(inWidth - 1):0] in, output [(countWidth - 1):0] count
-    );
-
-    wire [(inWidth - 1):0] reverseIn;
-    reverse#(inWidth) reverse_in(in, reverseIn);
-    wire [inWidth:0] oneLeastReverseIn =
-        {1'b1, reverseIn} & ({1'b0, ~reverseIn} + 1);
-    genvar ix;
-    generate
-        for (ix = 0; ix <= inWidth; ix = ix + 1) begin :Bit
-            wire [(countWidth - 1):0] countSoFar;
-            if (ix == 0) begin
-                assign countSoFar = 0;
-            end else begin
-                assign countSoFar =
-                    Bit[ix - 1].countSoFar | (oneLeastReverseIn[ix] ? ix : 0);
-                if (ix == inWidth) assign count = countSoFar;
-            end
-        end
-    endgenerate
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    compressBy2#(parameter inWidth = 1) (
-        input [(inWidth - 1):0] in, output [((inWidth - 1)/2):0] out
-    );
-
-    localparam maxBitNumReduced = (inWidth - 1)/2;
-    genvar ix;
-    generate
-        for (ix = 0; ix < maxBitNumReduced; ix = ix + 1) begin :Bit
-            assign out[ix] = |in[(ix*2 + 1):ix*2];
-        end
-    endgenerate
-    assign out[maxBitNumReduced] = |in[(inWidth - 1):maxBitNumReduced*2];
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    compressBy4#(parameter inWidth = 1) (
-        input [(inWidth - 1):0] in, output [(inWidth - 1)/4:0] out
-    );
-
-    localparam maxBitNumReduced = (inWidth - 1)/4;
-    genvar ix;
-    generate
-        for (ix = 0; ix < maxBitNumReduced; ix = ix + 1) begin :Bit
-            assign out[ix] = |in[(ix*4 + 3):ix*4];
-        end
-    endgenerate
-    assign out[maxBitNumReduced] = |in[(inWidth - 1):maxBitNumReduced*4];
-
-endmodule
-
-
-/*============================================================================
-
-This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
-Arithmetic Package, Release 1, by John R. Hauser.
-
-Copyright 2019 The Regents of the University of California.  All rights
-reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
- 1. Redistributions of source code must retain the above copyright notice,
-    this list of conditions, and the following disclaimer.
-
- 2. Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions, and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
-
- 3. Neither the name of the University nor the names of its contributors may
-    be used to endorse or promote products derived from this software without
-    specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
-DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-=============================================================================*/
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
     fNToRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
         input [(expWidth + sigWidth - 1):0] in,
         output [(expWidth + sigWidth):0] out
@@ -2775,6 +2987,100 @@ endfunction
             : isZero ? 3'b000 : adjustedExp[expWidth:(expWidth - 2)];
     assign exp[(expWidth - 3):0] = adjustedExp;
     assign out = {sign, exp, isZeroExpIn ? subnormFract : fractIn};
+
+endmodule
+
+
+/*============================================================================
+
+This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
+Arithmetic Package, Release 1, by John R. Hauser.
+
+Copyright 2019 The Regents of the University of California.  All rights
+reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+    this list of conditions, and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions, and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+ 3. Neither the name of the University nor the names of its contributors may
+    be used to endorse or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE
+DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=============================================================================*/
+
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    compareRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(expWidth + sigWidth):0] a,
+        input [(expWidth + sigWidth):0] b,
+        input signaling,
+        output lt,
+        output eq,
+        output gt,
+        output unordered,
+        output [4:0] exceptionFlags
+    );
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire isNaNA, isInfA, isZeroA, signA;
+    wire signed [(expWidth + 1):0] sExpA;
+    wire [sigWidth:0] sigA;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
+    wire isSigNaNA;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
+    wire isNaNB, isInfB, isZeroB, signB;
+    wire signed [(expWidth + 1):0] sExpB;
+    wire [sigWidth:0] sigB;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
+    wire isSigNaNB;
+    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire ordered = !isNaNA && !isNaNB;
+    wire bothInfs  = isInfA  && isInfB;
+    wire bothZeros = isZeroA && isZeroB;
+    wire eqExps = (sExpA == sExpB);
+    wire common_ltMags = (sExpA < sExpB) || (eqExps && (sigA < sigB));
+    wire common_eqMags = eqExps && (sigA == sigB);
+    wire ordered_lt =
+        !bothZeros
+            && ((signA && !signB)
+                    || (!bothInfs
+                            && ((signA && !common_ltMags && !common_eqMags)
+                                    || (!signB && common_ltMags))));
+    wire ordered_eq =
+        bothZeros || ((signA == signB) && (bothInfs || common_eqMags));
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire invalid = isSigNaNA || isSigNaNB || (signaling && !ordered);
+    assign lt = ordered && ordered_lt;
+    assign eq = ordered && ordered_eq;
+    assign gt = ordered && !ordered_lt && !ordered_eq;
+    assign unordered = !ordered;
+    assign exceptionFlags = {invalid, 4'b0};
 
 endmodule
 
@@ -2880,69 +3186,117 @@ module main(
   input logic clk,
   input logic reset,
   input logic go,
-  output logic done,
-  output logic mem_9_addr0,
-  output logic mem_9_content_en,
-  output logic mem_9_write_en,
-  output logic [31:0] mem_9_write_data,
-  input logic [31:0] mem_9_read_data,
-  input logic mem_9_done,
-  output logic [13:0] mem_8_addr0,
-  output logic mem_8_content_en,
-  output logic mem_8_write_en,
-  output logic [31:0] mem_8_write_data,
-  input logic [31:0] mem_8_read_data,
-  input logic mem_8_done,
-  output logic [12:0] mem_7_addr0,
-  output logic mem_7_content_en,
-  output logic mem_7_write_en,
-  output logic [31:0] mem_7_write_data,
-  input logic [31:0] mem_7_read_data,
-  input logic mem_7_done,
-  output logic [15:0] mem_6_addr0,
-  output logic mem_6_content_en,
-  output logic mem_6_write_en,
-  output logic [31:0] mem_6_write_data,
-  input logic [31:0] mem_6_read_data,
-  input logic mem_6_done,
-  output logic [2:0] mem_5_addr0,
-  output logic mem_5_content_en,
-  output logic mem_5_write_en,
-  output logic [31:0] mem_5_write_data,
-  input logic [31:0] mem_5_read_data,
-  input logic mem_5_done,
-  output logic [9:0] mem_4_addr0,
-  output logic mem_4_content_en,
-  output logic mem_4_write_en,
-  output logic [31:0] mem_4_write_data,
-  input logic [31:0] mem_4_read_data,
-  input logic mem_4_done,
-  output logic [13:0] mem_3_addr0,
-  output logic mem_3_content_en,
-  output logic mem_3_write_en,
-  output logic [31:0] mem_3_write_data,
-  input logic [31:0] mem_3_read_data,
-  input logic mem_3_done,
-  output logic mem_2_addr0,
-  output logic mem_2_content_en,
-  output logic mem_2_write_en,
-  output logic [31:0] mem_2_write_data,
-  input logic [31:0] mem_2_read_data,
-  input logic mem_2_done,
-  output logic mem_1_addr0,
-  output logic mem_1_content_en,
-  output logic mem_1_write_en,
-  output logic [31:0] mem_1_write_data,
-  input logic [31:0] mem_1_read_data,
-  input logic mem_1_done,
-  output logic [13:0] mem_0_addr0,
-  output logic mem_0_content_en,
-  output logic mem_0_write_en,
-  output logic [31:0] mem_0_write_data,
-  input logic [31:0] mem_0_read_data,
-  input logic mem_0_done
+  output logic done
 );
 // COMPONENT START: main
+string DATA;
+int CODE;
+initial begin
+    CODE = $value$plusargs("DATA=%s", DATA);
+    $display("DATA (path to meminit files): %s", DATA);
+    $readmemh({DATA, "/mem_9.dat"}, mem_9.mem);
+    $readmemh({DATA, "/mem_8.dat"}, mem_8.mem);
+    $readmemh({DATA, "/mem_7.dat"}, mem_7.mem);
+    $readmemh({DATA, "/mem_6.dat"}, mem_6.mem);
+    $readmemh({DATA, "/mem_5.dat"}, mem_5.mem);
+    $readmemh({DATA, "/mem_4.dat"}, mem_4.mem);
+    $readmemh({DATA, "/mem_3.dat"}, mem_3.mem);
+    $readmemh({DATA, "/mem_2.dat"}, mem_2.mem);
+    $readmemh({DATA, "/mem_1.dat"}, mem_1.mem);
+    $readmemh({DATA, "/mem_0.dat"}, mem_0.mem);
+end
+final begin
+    $writememh({DATA, "/mem_9.out"}, mem_9.mem);
+    $writememh({DATA, "/mem_8.out"}, mem_8.mem);
+    $writememh({DATA, "/mem_7.out"}, mem_7.mem);
+    $writememh({DATA, "/mem_6.out"}, mem_6.mem);
+    $writememh({DATA, "/mem_5.out"}, mem_5.mem);
+    $writememh({DATA, "/mem_4.out"}, mem_4.mem);
+    $writememh({DATA, "/mem_3.out"}, mem_3.mem);
+    $writememh({DATA, "/mem_2.out"}, mem_2.mem);
+    $writememh({DATA, "/mem_1.out"}, mem_1.mem);
+    $writememh({DATA, "/mem_0.out"}, mem_0.mem);
+end
+logic mem_9_clk;
+logic mem_9_reset;
+logic mem_9_addr0;
+logic mem_9_content_en;
+logic mem_9_write_en;
+logic [31:0] mem_9_write_data;
+logic [31:0] mem_9_read_data;
+logic mem_9_done;
+logic mem_8_clk;
+logic mem_8_reset;
+logic [13:0] mem_8_addr0;
+logic mem_8_content_en;
+logic mem_8_write_en;
+logic [31:0] mem_8_write_data;
+logic [31:0] mem_8_read_data;
+logic mem_8_done;
+logic mem_7_clk;
+logic mem_7_reset;
+logic [12:0] mem_7_addr0;
+logic mem_7_content_en;
+logic mem_7_write_en;
+logic [31:0] mem_7_write_data;
+logic [31:0] mem_7_read_data;
+logic mem_7_done;
+logic mem_6_clk;
+logic mem_6_reset;
+logic [15:0] mem_6_addr0;
+logic mem_6_content_en;
+logic mem_6_write_en;
+logic [31:0] mem_6_write_data;
+logic [31:0] mem_6_read_data;
+logic mem_6_done;
+logic mem_5_clk;
+logic mem_5_reset;
+logic [2:0] mem_5_addr0;
+logic mem_5_content_en;
+logic mem_5_write_en;
+logic [31:0] mem_5_write_data;
+logic [31:0] mem_5_read_data;
+logic mem_5_done;
+logic mem_4_clk;
+logic mem_4_reset;
+logic [9:0] mem_4_addr0;
+logic mem_4_content_en;
+logic mem_4_write_en;
+logic [31:0] mem_4_write_data;
+logic [31:0] mem_4_read_data;
+logic mem_4_done;
+logic mem_3_clk;
+logic mem_3_reset;
+logic [13:0] mem_3_addr0;
+logic mem_3_content_en;
+logic mem_3_write_en;
+logic [31:0] mem_3_write_data;
+logic [31:0] mem_3_read_data;
+logic mem_3_done;
+logic mem_2_clk;
+logic mem_2_reset;
+logic mem_2_addr0;
+logic mem_2_content_en;
+logic mem_2_write_en;
+logic [31:0] mem_2_write_data;
+logic [31:0] mem_2_read_data;
+logic mem_2_done;
+logic mem_1_clk;
+logic mem_1_reset;
+logic mem_1_addr0;
+logic mem_1_content_en;
+logic mem_1_write_en;
+logic [31:0] mem_1_write_data;
+logic [31:0] mem_1_read_data;
+logic mem_1_done;
+logic mem_0_clk;
+logic mem_0_reset;
+logic [13:0] mem_0_addr0;
+logic mem_0_content_en;
+logic mem_0_write_en;
+logic [31:0] mem_0_write_data;
+logic [31:0] mem_0_read_data;
+logic mem_0_done;
 logic main_1_instance_clk;
 logic main_1_instance_reset;
 logic main_1_instance_go;
@@ -3011,6 +3365,146 @@ logic invoke0_go_in;
 logic invoke0_go_out;
 logic invoke0_done_in;
 logic invoke0_done_out;
+seq_mem_d1 # (
+    .IDX_SIZE(1),
+    .SIZE(2),
+    .WIDTH(32)
+) mem_9 (
+    .addr0(mem_9_addr0),
+    .clk(mem_9_clk),
+    .content_en(mem_9_content_en),
+    .done(mem_9_done),
+    .read_data(mem_9_read_data),
+    .reset(mem_9_reset),
+    .write_data(mem_9_write_data),
+    .write_en(mem_9_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(14),
+    .SIZE(10944),
+    .WIDTH(32)
+) mem_8 (
+    .addr0(mem_8_addr0),
+    .clk(mem_8_clk),
+    .content_en(mem_8_content_en),
+    .done(mem_8_done),
+    .read_data(mem_8_read_data),
+    .reset(mem_8_reset),
+    .write_data(mem_8_write_data),
+    .write_en(mem_8_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(13),
+    .SIZE(5472),
+    .WIDTH(32)
+) mem_7 (
+    .addr0(mem_7_addr0),
+    .clk(mem_7_clk),
+    .content_en(mem_7_content_en),
+    .done(mem_7_done),
+    .read_data(mem_7_read_data),
+    .reset(mem_7_reset),
+    .write_data(mem_7_write_data),
+    .write_en(mem_7_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(16),
+    .SIZE(34048),
+    .WIDTH(32)
+) mem_6 (
+    .addr0(mem_6_addr0),
+    .clk(mem_6_clk),
+    .content_en(mem_6_content_en),
+    .done(mem_6_done),
+    .read_data(mem_6_read_data),
+    .reset(mem_6_reset),
+    .write_data(mem_6_write_data),
+    .write_en(mem_6_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(3),
+    .SIZE(8),
+    .WIDTH(32)
+) mem_5 (
+    .addr0(mem_5_addr0),
+    .clk(mem_5_clk),
+    .content_en(mem_5_content_en),
+    .done(mem_5_done),
+    .read_data(mem_5_read_data),
+    .reset(mem_5_reset),
+    .write_data(mem_5_write_data),
+    .write_en(mem_5_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(10),
+    .SIZE(600),
+    .WIDTH(32)
+) mem_4 (
+    .addr0(mem_4_addr0),
+    .clk(mem_4_clk),
+    .content_en(mem_4_content_en),
+    .done(mem_4_done),
+    .read_data(mem_4_read_data),
+    .reset(mem_4_reset),
+    .write_data(mem_4_write_data),
+    .write_en(mem_4_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(14),
+    .SIZE(10944),
+    .WIDTH(32)
+) mem_3 (
+    .addr0(mem_3_addr0),
+    .clk(mem_3_clk),
+    .content_en(mem_3_content_en),
+    .done(mem_3_done),
+    .read_data(mem_3_read_data),
+    .reset(mem_3_reset),
+    .write_data(mem_3_write_data),
+    .write_en(mem_3_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(1),
+    .SIZE(2),
+    .WIDTH(32)
+) mem_2 (
+    .addr0(mem_2_addr0),
+    .clk(mem_2_clk),
+    .content_en(mem_2_content_en),
+    .done(mem_2_done),
+    .read_data(mem_2_read_data),
+    .reset(mem_2_reset),
+    .write_data(mem_2_write_data),
+    .write_en(mem_2_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(1),
+    .SIZE(2),
+    .WIDTH(32)
+) mem_1 (
+    .addr0(mem_1_addr0),
+    .clk(mem_1_clk),
+    .content_en(mem_1_content_en),
+    .done(mem_1_done),
+    .read_data(mem_1_read_data),
+    .reset(mem_1_reset),
+    .write_data(mem_1_write_data),
+    .write_en(mem_1_write_en)
+);
+seq_mem_d1 # (
+    .IDX_SIZE(14),
+    .SIZE(14400),
+    .WIDTH(32)
+) mem_0 (
+    .addr0(mem_0_addr0),
+    .clk(mem_0_clk),
+    .content_en(mem_0_content_en),
+    .done(mem_0_done),
+    .read_data(mem_0_read_data),
+    .reset(mem_0_reset),
+    .write_data(mem_0_write_data),
+    .write_en(mem_0_write_en)
+);
 main_1 main_1_instance (
     .arg_mem_0_addr0(main_1_instance_arg_mem_0_addr0),
     .arg_mem_0_content_en(main_1_instance_arg_mem_0_content_en),
@@ -3090,11 +3584,11 @@ std_wire # (
     .out(invoke0_done_out)
 );
 wire _guard0 = 1;
-wire _guard1 = invoke0_done_out;
+wire _guard1 = invoke0_go_out;
 wire _guard2 = invoke0_go_out;
 wire _guard3 = invoke0_go_out;
 wire _guard4 = invoke0_go_out;
-wire _guard5 = invoke0_go_out;
+wire _guard5 = invoke0_done_out;
 wire _guard6 = invoke0_go_out;
 wire _guard7 = invoke0_go_out;
 wire _guard8 = invoke0_go_out;
@@ -3141,129 +3635,154 @@ wire _guard48 = invoke0_go_out;
 wire _guard49 = invoke0_go_out;
 wire _guard50 = invoke0_go_out;
 wire _guard51 = invoke0_go_out;
-assign done = _guard1;
-assign mem_5_content_en =
-  _guard2 ? main_1_instance_arg_mem_5_content_en :
+assign mem_7_write_en =
+  _guard1 ? main_1_instance_arg_mem_7_write_en :
   1'd0;
-assign mem_4_addr0 = main_1_instance_arg_mem_4_addr0;
-assign mem_8_write_data = main_1_instance_arg_mem_8_write_data;
+assign mem_7_clk = clk;
 assign mem_7_addr0 = main_1_instance_arg_mem_7_addr0;
-assign mem_6_content_en =
-  _guard6 ? main_1_instance_arg_mem_6_content_en :
+assign mem_7_content_en =
+  _guard3 ? main_1_instance_arg_mem_7_content_en :
   1'd0;
-assign mem_5_addr0 = main_1_instance_arg_mem_5_addr0;
-assign mem_9_write_en =
-  _guard8 ? main_1_instance_arg_mem_9_write_en :
+assign mem_7_reset = reset;
+assign mem_7_write_data = main_1_instance_arg_mem_7_write_data;
+assign done = _guard5;
+assign mem_2_write_en = 1'd0;
+assign mem_2_clk = clk;
+assign mem_2_addr0 = main_1_instance_arg_mem_2_addr0;
+assign mem_2_content_en =
+  _guard7 ? main_1_instance_arg_mem_2_content_en :
   1'd0;
+assign mem_2_reset = reset;
+assign mem_4_write_en = 1'd0;
+assign mem_4_clk = clk;
+assign mem_4_addr0 = main_1_instance_arg_mem_4_addr0;
 assign mem_4_content_en =
   _guard9 ? main_1_instance_arg_mem_4_content_en :
   1'd0;
-assign mem_8_content_en =
-  _guard10 ? main_1_instance_arg_mem_8_content_en :
+assign mem_4_reset = reset;
+assign mem_9_write_en =
+  _guard10 ? main_1_instance_arg_mem_9_write_en :
   1'd0;
+assign mem_9_clk = clk;
 assign mem_9_addr0 = main_1_instance_arg_mem_9_addr0;
-assign mem_7_content_en =
-  _guard12 ? main_1_instance_arg_mem_7_content_en :
-  1'd0;
-assign mem_3_content_en =
-  _guard13 ? main_1_instance_arg_mem_3_content_en :
-  1'd0;
 assign mem_9_content_en =
-  _guard14 ? main_1_instance_arg_mem_9_content_en :
+  _guard12 ? main_1_instance_arg_mem_9_content_en :
   1'd0;
-assign mem_7_write_en =
-  _guard15 ? main_1_instance_arg_mem_7_write_en :
+assign mem_9_reset = reset;
+assign mem_9_write_data = main_1_instance_arg_mem_9_write_data;
+assign invoke0_go_in = go;
+assign mem_1_write_en =
+  _guard14 ? main_1_instance_arg_mem_1_write_en :
   1'd0;
+assign mem_1_clk = clk;
 assign mem_1_addr0 = main_1_instance_arg_mem_1_addr0;
 assign mem_1_content_en =
-  _guard17 ? main_1_instance_arg_mem_1_content_en :
+  _guard16 ? main_1_instance_arg_mem_1_content_en :
   1'd0;
-assign mem_6_write_en =
-  _guard18 ? main_1_instance_arg_mem_6_write_en :
-  1'd0;
-assign mem_0_addr0 = main_1_instance_arg_mem_0_addr0;
-assign mem_6_addr0 = main_1_instance_arg_mem_6_addr0;
-assign mem_2_addr0 = main_1_instance_arg_mem_2_addr0;
-assign mem_1_write_en =
-  _guard22 ? main_1_instance_arg_mem_1_write_en :
-  1'd0;
-assign mem_9_write_data = main_1_instance_arg_mem_9_write_data;
-assign mem_8_write_en =
-  _guard24 ? main_1_instance_arg_mem_8_write_en :
-  1'd0;
-assign mem_7_write_data = main_1_instance_arg_mem_7_write_data;
-assign mem_6_write_data = main_1_instance_arg_mem_6_write_data;
-assign mem_2_content_en =
-  _guard27 ? main_1_instance_arg_mem_2_content_en :
-  1'd0;
+assign mem_1_reset = reset;
 assign mem_1_write_data = main_1_instance_arg_mem_1_write_data;
-assign mem_0_content_en =
-  _guard29 ? main_1_instance_arg_mem_0_content_en :
-  1'd0;
-assign mem_8_addr0 = main_1_instance_arg_mem_8_addr0;
-assign mem_3_addr0 = main_1_instance_arg_mem_3_addr0;
-assign invoke0_go_in = go;
 assign main_1_instance_arg_mem_4_done =
-  _guard32 ? mem_4_done :
+  _guard18 ? mem_4_done :
   1'd0;
 assign main_1_instance_arg_mem_0_read_data =
-  _guard33 ? mem_0_read_data :
+  _guard19 ? mem_0_read_data :
   32'd0;
 assign main_1_instance_arg_mem_0_done =
-  _guard34 ? mem_0_done :
+  _guard20 ? mem_0_done :
   1'd0;
 assign main_1_instance_arg_mem_3_read_data =
-  _guard35 ? mem_3_read_data :
+  _guard21 ? mem_3_read_data :
   32'd0;
 assign main_1_instance_arg_mem_2_read_data =
-  _guard36 ? mem_2_read_data :
+  _guard22 ? mem_2_read_data :
   32'd0;
 assign main_1_instance_arg_mem_6_read_data =
-  _guard37 ? mem_6_read_data :
+  _guard23 ? mem_6_read_data :
   32'd0;
 assign main_1_instance_clk = clk;
 assign main_1_instance_arg_mem_9_read_data =
-  _guard38 ? mem_9_read_data :
+  _guard24 ? mem_9_read_data :
   32'd0;
 assign main_1_instance_arg_mem_5_read_data =
-  _guard39 ? mem_5_read_data :
+  _guard25 ? mem_5_read_data :
   32'd0;
 assign main_1_instance_arg_mem_3_done =
-  _guard40 ? mem_3_done :
+  _guard26 ? mem_3_done :
   1'd0;
 assign main_1_instance_reset = reset;
-assign main_1_instance_go = _guard41;
+assign main_1_instance_go = _guard27;
 assign main_1_instance_arg_mem_5_done =
-  _guard42 ? mem_5_done :
+  _guard28 ? mem_5_done :
   1'd0;
 assign main_1_instance_arg_mem_9_done =
-  _guard43 ? mem_9_done :
+  _guard29 ? mem_9_done :
   1'd0;
 assign main_1_instance_arg_mem_7_read_data =
-  _guard44 ? mem_7_read_data :
+  _guard30 ? mem_7_read_data :
   32'd0;
 assign main_1_instance_arg_mem_2_done =
-  _guard45 ? mem_2_done :
+  _guard31 ? mem_2_done :
   1'd0;
 assign main_1_instance_arg_mem_1_done =
-  _guard46 ? mem_1_done :
+  _guard32 ? mem_1_done :
   1'd0;
 assign main_1_instance_arg_mem_6_done =
-  _guard47 ? mem_6_done :
+  _guard33 ? mem_6_done :
   1'd0;
 assign main_1_instance_arg_mem_8_read_data =
-  _guard48 ? mem_8_read_data :
+  _guard34 ? mem_8_read_data :
   32'd0;
 assign main_1_instance_arg_mem_8_done =
-  _guard49 ? mem_8_done :
+  _guard35 ? mem_8_done :
   1'd0;
 assign main_1_instance_arg_mem_4_read_data =
-  _guard50 ? mem_4_read_data :
+  _guard36 ? mem_4_read_data :
   32'd0;
 assign main_1_instance_arg_mem_7_done =
-  _guard51 ? mem_7_done :
+  _guard37 ? mem_7_done :
   1'd0;
 assign invoke0_done_in = main_1_instance_done;
+assign mem_0_write_en = 1'd0;
+assign mem_0_clk = clk;
+assign mem_0_addr0 = main_1_instance_arg_mem_0_addr0;
+assign mem_0_content_en =
+  _guard39 ? main_1_instance_arg_mem_0_content_en :
+  1'd0;
+assign mem_0_reset = reset;
+assign mem_8_write_en =
+  _guard40 ? main_1_instance_arg_mem_8_write_en :
+  1'd0;
+assign mem_8_clk = clk;
+assign mem_8_addr0 = main_1_instance_arg_mem_8_addr0;
+assign mem_8_content_en =
+  _guard42 ? main_1_instance_arg_mem_8_content_en :
+  1'd0;
+assign mem_8_reset = reset;
+assign mem_8_write_data = main_1_instance_arg_mem_8_write_data;
+assign mem_3_write_en = 1'd0;
+assign mem_3_clk = clk;
+assign mem_3_addr0 = main_1_instance_arg_mem_3_addr0;
+assign mem_3_content_en =
+  _guard45 ? main_1_instance_arg_mem_3_content_en :
+  1'd0;
+assign mem_3_reset = reset;
+assign mem_6_write_en =
+  _guard46 ? main_1_instance_arg_mem_6_write_en :
+  1'd0;
+assign mem_6_clk = clk;
+assign mem_6_addr0 = main_1_instance_arg_mem_6_addr0;
+assign mem_6_content_en =
+  _guard48 ? main_1_instance_arg_mem_6_content_en :
+  1'd0;
+assign mem_6_reset = reset;
+assign mem_6_write_data = main_1_instance_arg_mem_6_write_data;
+assign mem_5_write_en = 1'd0;
+assign mem_5_clk = clk;
+assign mem_5_addr0 = main_1_instance_arg_mem_5_addr0;
+assign mem_5_content_en =
+  _guard51 ? main_1_instance_arg_mem_5_content_en :
+  1'd0;
+assign mem_5_reset = reset;
 // COMPONENT END: main
 endmodule
 module main_1(
@@ -14779,6 +15298,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =============================================================================*/
 
+/*----------------------------------------------------------------------------
+*----------------------------------------------------------------------------*/
+
+module
+    recFNToFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(expWidth + sigWidth):0] in,
+        output [(expWidth + sigWidth - 1):0] out
+    );
 
 /*============================================================================
 
@@ -14817,32 +15344,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-`define round_near_even   3'b000
-`define round_minMag      3'b001
-`define round_min         3'b010
-`define round_max         3'b011
-`define round_near_maxMag 3'b100
-`define round_odd         3'b110
 
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define floatControlWidth 1
-`define flControl_tininessBeforeRounding 1'b0
-`define flControl_tininessAfterRounding  1'b1
+function integer clog2;
+    input integer a;
 
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define flRoundOpt_sigMSBitAlwaysZero  1
-`define flRoundOpt_subnormsAlwaysExact 2
-`define flRoundOpt_neverUnderflows     4
-`define flRoundOpt_neverOverflows      8
+    begin
+        a = a - 1;
+        for (clog2 = 0; a > 0; clog2 = clog2 + 1) a = a>>1;
+    end
 
+endfunction
+
+
+
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    localparam [expWidth:0] minNormExp = (1<<(expWidth - 1)) + 2;
+    localparam normDistWidth = clog2(sigWidth);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire isNaN, isInf, isZero, sign;
+    wire signed [(expWidth + 1):0] sExp;
+    wire [sigWidth:0] sig;
+    recFNToRawFN#(expWidth, sigWidth)
+        recFNToRawFN(in, isNaN, isInf, isZero, sign, sExp, sig);
+    wire isSubnormal = (sExp < minNormExp);
+    /*------------------------------------------------------------------------
+    *------------------------------------------------------------------------*/
+    wire [(normDistWidth - 1):0] denormShiftDist = minNormExp - 1 - sExp;
+    wire [(expWidth - 1):0] expOut =
+        (isSubnormal ? 0 : sExp - minNormExp + 1)
+            | (isNaN || isInf ? {expWidth{1'b1}} : 0);
+    wire [(sigWidth - 2):0] fractOut =
+        isSubnormal ? (sig>>1)>>denormShiftDist : isInf ? 0 : sig;
+    assign out = {sign, expOut, fractOut};
+
+endmodule
 
 
 /*============================================================================
 
-This Verilog include file is part of the Berkeley HardFloat IEEE Floating-
-Point Arithmetic Package, Release 1, by John R. Hauser.
+This Verilog source file is part of the Berkeley HardFloat IEEE Floating-Point
+Arithmetic Package, Release 1, by John R. Hauser.
 
 Copyright 2019 The Regents of the University of California.  All rights
 reserved.
@@ -14876,175 +15419,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
-`define flControl_default `flControl_tininessAfterRounding
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-//`define HardFloat_propagateNaNPayloads
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-`define HardFloat_signDefaultNaN 0
-`define HardFloat_fractDefaultNaN(sigWidth) {1'b1, {((sigWidth) - 2){1'b0}}}
-
-
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
 
 module
-    mulRecFNToFullRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(1 - 1):0] control,
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        output invalidExc,
-        output out_isNaN,
-        output out_isInf,
-        output out_isZero,
-        output out_sign,
-        output signed [(expWidth + 1):0] out_sExp,
-        output [(sigWidth*2 - 1):0] out_sig
+    isSigNaNRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
+        input [(expWidth + sigWidth):0] in, output isSigNaN
     );
 
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire isNaNA, isInfA, isZeroA, signA;
-    wire signed [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
-    wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
-    wire isNaNB, isInfB, isZeroB, signB;
-    wire signed [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
-    wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire notSigNaN_invalidExc = (isInfA && isZeroB) || (isZeroA && isInfB);
-    wire notNaN_isInfOut = isInfA || isInfB;
-    wire notNaN_isZeroOut = isZeroA || isZeroB;
-    wire notNaN_signOut = signA ^ signB;
-    wire signed [(expWidth + 1):0] common_sExpOut =
-        sExpA + sExpB - (1<<expWidth);
-    wire [(sigWidth*2 - 1):0] common_sigOut = sigA * sigB;
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
-    assign out_isInf = notNaN_isInfOut;
-    assign out_isZero = notNaN_isZeroOut;
-    assign out_sExp = common_sExpOut;
-assign out_isNaN = isNaNA || isNaNB;
-    assign out_sign = notNaN_signOut;
-    assign out_sig = common_sigOut;
-
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    mulRecFNToRaw#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(1 - 1):0] control,
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        output invalidExc,
-        output out_isNaN,
-        output out_isInf,
-        output out_isZero,
-        output out_sign,
-        output signed [(expWidth + 1):0] out_sExp,
-        output [(sigWidth + 2):0] out_sig
-    );
-
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire isNaNA, isInfA, isZeroA, signA;
-    wire signed [(expWidth + 1):0] sExpA;
-    wire [sigWidth:0] sigA;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_a(a, isNaNA, isInfA, isZeroA, signA, sExpA, sigA);
-    wire isSigNaNA;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_a(a, isSigNaNA);
-    wire isNaNB, isInfB, isZeroB, signB;
-    wire signed [(expWidth + 1):0] sExpB;
-    wire [sigWidth:0] sigB;
-    recFNToRawFN#(expWidth, sigWidth)
-        recFNToRawFN_b(b, isNaNB, isInfB, isZeroB, signB, sExpB, sigB);
-    wire isSigNaNB;
-    isSigNaNRecFN#(expWidth, sigWidth) isSigNaN_b(b, isSigNaNB);
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    wire notSigNaN_invalidExc = (isInfA && isZeroB) || (isZeroA && isInfB);
-    wire notNaN_isInfOut = isInfA || isInfB;
-    wire notNaN_isZeroOut = isZeroA || isZeroB;
-    wire notNaN_signOut = signA ^ signB;
-    wire signed [(expWidth + 1):0] common_sExpOut =
-        sExpA + sExpB - (1<<expWidth);
-    wire [(sigWidth*2 - 1):0] sigProd = sigA * sigB;
-    wire [(sigWidth + 2):0] common_sigOut =
-        {sigProd[(sigWidth*2 - 1):(sigWidth - 2)], |sigProd[(sigWidth - 3):0]};
-    /*------------------------------------------------------------------------
-    *------------------------------------------------------------------------*/
-    assign invalidExc = isSigNaNA || isSigNaNB || notSigNaN_invalidExc;
-    assign out_isInf = notNaN_isInfOut;
-    assign out_isZero = notNaN_isZeroOut;
-    assign out_sExp = common_sExpOut;
-assign out_isNaN = isNaNA || isNaNB;
-    assign out_sign = notNaN_signOut;
-    assign out_sig = common_sigOut;
-
-
-endmodule
-
-/*----------------------------------------------------------------------------
-*----------------------------------------------------------------------------*/
-
-module
-    mulRecFN#(parameter expWidth = 3, parameter sigWidth = 3) (
-        input [(1 - 1):0] control,
-        input [(expWidth + sigWidth):0] a,
-        input [(expWidth + sigWidth):0] b,
-        input [2:0] roundingMode,
-        output [(expWidth + sigWidth):0] out,
-        output [4:0] exceptionFlags
-    );
-
-    wire invalidExc, out_isNaN, out_isInf, out_isZero, out_sign;
-    wire signed [(expWidth + 1):0] out_sExp;
-    wire [(sigWidth + 2):0] out_sig;
-    mulRecFNToRaw#(expWidth, sigWidth)
-        mulRecFNToRaw(
-            control,
-            a,
-            b,
-            invalidExc,
-            out_isNaN,
-            out_isInf,
-            out_isZero,
-            out_sign,
-            out_sExp,
-            out_sig
-        );
-    roundRawFNToRecFN#(expWidth, sigWidth, 0)
-        roundRawOut(
-            control,
-            invalidExc,
-            1'b0,
-            out_isNaN,
-            out_isInf,
-            out_isZero,
-            out_sign,
-            out_sExp,
-            out_sig,
-            roundingMode,
-            out,
-            exceptionFlags
-        );
+    wire isNaN =
+        (in[(expWidth + sigWidth - 1):(expWidth + sigWidth - 3)] == 'b111);
+    assign isSigNaN = isNaN && !in[sigWidth - 2];
 
 endmodule
 
