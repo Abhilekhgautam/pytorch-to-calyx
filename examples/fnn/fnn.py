@@ -1,27 +1,28 @@
 import torch
-import torch.nn.functional as F
 import torch.nn as nn
+from torch_mlir import fx;
 
-import allo
-
-class Model(nn.Module):
+class SimpleFFNN(nn.Module):
     def __init__(self):
-        super(Model, self).__init__()
+        super(SimpleFFNN, self).__init__()
+        self.fc1 = nn.Linear(64, 48)   
+        self.relu = nn.ReLU()          
+        self.fc2 = nn.Linear(48, 4)   
 
-    def forward(self, x, y):
-        x = x + y
-        x = F.relu(x)
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
         return x
 
-model = Model()
-model.eval()
+model = SimpleFFNN()
+model.eval()  
+input = torch.randn(1, 64) 
 
-example_inputs = [torch.rand(1, 3, 10, 10), torch.rand(1, 3, 10, 10)]
+mlir_module = fx.export_and_import(
+    model,
+    input,
+    output_type="linalg-on-tensors"
+)
 
-mod = allo.frontend.from_pytorch(model, target="mlir", example_inputs=example_inputs)
-
-with open("fnn.mlir", "w") as f:
-    f.write(str(mod.module))
-
-print("MLIR saved to fnn.mlir")
-
+print(mlir_module)
